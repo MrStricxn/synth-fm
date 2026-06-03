@@ -6,10 +6,34 @@ export default function SCWidget() {
   const iframeRef = useRef(null)
   const widgetRef = useRef(null)
   const readyRef = useRef(false)
+  const loadedUrlRef = useRef(null)
 
   const currentTrack = usePlayerStore(s => s.currentTrack)
   const isPlaying    = usePlayerStore(s => s.isPlaying)
   const volume       = usePlayerStore(s => s.volume)
+
+  // Load whatever track is currently selected in the store. Safe to call
+  // repeatedly — it no-ops if the widget isn't ready or the URL is unchanged.
+  function loadCurrent() {
+    const w = widgetRef.current
+    if (!w || !readyRef.current) return
+    const { currentTrack: track, isPlaying: playing, volume: vol } = usePlayerStore.getState()
+    if (!track || loadedUrlRef.current === track.url) return
+    loadedUrlRef.current = track.url
+    try {
+      w.load(track.url, {
+        auto_play: playing,
+        callback: () => {
+          try {
+            w.setVolume(vol)
+            w.getDuration(d => { if (d) usePlayerStore.getState().setDuration(d) })
+          } catch (err) { console.error('SCWidget post-load failed:', err) }
+        },
+      })
+    } catch (err) {
+      console.error('SCWidget load failed:', err)
+    }
+  }
 
   // Initialize the SoundCloud widget once. The SC API script may not be ready
   // at mount time (or may be blocked entirely), so we poll briefly for it and
@@ -25,9 +49,23 @@ export default function SCWidget() {
         widgetRef.current = widget
         const Events = window.SC.Widget.Events
 
-        widget.bind(Events.READY, () => { readyRef.current = true })
+        widget.bind(Events.READY, () => {
+          readyRef.current = true
+          try { widget.setVolume(usePlayerStore.getState().volume) } catch { /* noop */ }
+          loadCurrent()
+        })
+
+        // PLAY_PROGRESS has NO duration field — derive it from relativePosition
+        // and also fetch it explicitly on PLAY as a reliable fallback.
+        widget.bind(Events.PLAY, () => {
+          try { widget.getDuration(d => { if (d) usePlayerStore.getState().setDuration(d) }) } catch { /* noop */ }
+        })
         widget.bind(Events.PLAY_PROGRESS, (e) => {
-          if (e) usePlayerStore.getState().setProgress(e.currentPosition, e.duration)
+          if (!e) return
+          const dur = e.relativePosition > 0.0005
+            ? Math.round(e.currentPosition / e.relativePosition)
+            : 0
+          usePlayerStore.getState().setProgress(e.currentPosition, dur)
         })
         widget.bind(Events.FINISH, () => {
           usePlayerStore.getState().nextTrack()
@@ -54,28 +92,21 @@ export default function SCWidget() {
     }
   }, [])
 
-  useEffect(() => {
-    try {
-      if (!widgetRef.current || !readyRef.current || !currentTrack) return
-      widgetRef.current.load(currentTrack.url, { auto_play: isPlaying })
-    } catch (err) {
-      console.error('SCWidget load failed:', err)
-    }
-  }, [currentTrack])
+  // Load the new track whenever the selection changes.
+  useEffect(() => { loadCurrent() }, [currentTrack])
 
+  // Sync play / pause.
   useEffect(() => {
     try {
       if (!widgetRef.current || !readyRef.current || !currentTrack) return
-      if (isPlaying) {
-        widgetRef.current.play()
-      } else {
-        widgetRef.current.pause()
-      }
+      if (isPlaying) widgetRef.current.play()
+      else widgetRef.current.pause()
     } catch (err) {
       console.error('SCWidget play/pause failed:', err)
     }
   }, [isPlaying])
 
+  // Sync volume.
   useEffect(() => {
     try {
       if (!widgetRef.current || !readyRef.current) return
@@ -85,6 +116,7 @@ export default function SCWidget() {
     }
   }, [volume])
 
+  // Seek requests dispatched from the PlayerBar.
   useEffect(() => {
     function onSeek(e) {
       try {

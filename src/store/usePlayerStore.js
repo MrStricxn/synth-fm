@@ -59,6 +59,7 @@ export const usePlayerStore = create(
           queue,
           queueIndex: index >= 0 ? index : 0,
           progress: 0,
+          duration: 0,
         })
       },
 
@@ -73,14 +74,14 @@ export const usePlayerStore = create(
         } else {
           next = (queueIndex + 1) % queue.length
         }
-        set({ queueIndex: next, currentTrack: queue[next], isPlaying: true, progress: 0 })
+        set({ queueIndex: next, currentTrack: queue[next], isPlaying: true, progress: 0, duration: 0 })
       },
 
       prevTrack: () => {
         const { queue, queueIndex } = get()
         if (!queue.length) return
         const prev = (queueIndex - 1 + queue.length) % queue.length
-        set({ queueIndex: prev, currentTrack: queue[prev], isPlaying: true, progress: 0 })
+        set({ queueIndex: prev, currentTrack: queue[prev], isPlaying: true, progress: 0, duration: 0 })
       },
 
       toggleLike: (track) => set(s => {
@@ -106,7 +107,9 @@ export const usePlayerStore = create(
 
       setSearchQuery: (q) => set({ searchQuery: q }),
 
-      setProgress: (progress, duration) => set({ progress, duration }),
+      setProgress: (progress, duration) => set(s => ({ progress, duration: duration || s.duration })),
+
+      setDuration: (duration) => set({ duration }),
 
       setVolume: (volume) => set({ volume }),
 
