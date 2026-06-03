@@ -42,6 +42,8 @@ const initialState = {
   activeView: 'library',
   activePlaylistId: null,
   searchQuery: '',
+  fullscreen: false,
+  prevVolume: 80,
 }
 
 export const usePlayerStore = create(
@@ -112,6 +114,16 @@ export const usePlayerStore = create(
       setDuration: (duration) => set({ duration }),
 
       setVolume: (volume) => set({ volume }),
+
+      toggleMute: () => set(s => (
+        s.volume > 0
+          ? { volume: 0, prevVolume: s.volume }
+          : { volume: s.prevVolume || 80 }
+      )),
+
+      setFullscreen: (fullscreen) => set({ fullscreen }),
+
+      toggleFullscreen: () => set(s => ({ fullscreen: !s.fullscreen })),
 
       toggleShuffle: () => set(s => ({ shuffle: !s.shuffle })),
 

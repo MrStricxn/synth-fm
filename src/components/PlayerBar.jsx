@@ -17,6 +17,7 @@ const Icon = {
   repeat: <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M17 2.5 20.5 6 17 9.5M3.5 11V9a3 3 0 0 1 3-3h14M7 21.5 3.5 18 7 14.5M20.5 13v2a3 3 0 0 1-3 3h-14"/></svg>,
   volume: <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11 5 6.5 8.5H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h3.5L11 19a1 1 0 0 0 1.6-.8V5.8A1 1 0 0 0 11 5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
   heart: (liked) => <svg viewBox="0 0 24 24" width="20" height="20" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20s-7-4.3-9.2-8.5C1.3 8.3 2.8 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.2 0 4.7 3.3 3.2 6.5C19 15.7 12 20 12 20Z"/></svg>,
+  expand: <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>,
 }
 
 function ratioFromEvent(el, clientX) {
@@ -28,7 +29,7 @@ function ratioFromEvent(el, clientX) {
 export default function PlayerBar({
   currentTrack, isPlaying, progress, duration, volume,
   isLiked, shuffle, repeat,
-  onTogglePlay, onNext, onPrev, onSeek, onVolume, onLike, onShuffle, onRepeat,
+  onTogglePlay, onNext, onPrev, onSeek, onVolume, onLike, onShuffle, onRepeat, onExpand,
 }) {
   const seekRef = useRef(null)
   const volRef = useRef(null)
@@ -126,6 +127,7 @@ export default function PlayerBar({
           <div className="player-bar__vol-fill" style={{ width: `${volume}%` }} />
           <div className="player-bar__vol-thumb" style={{ left: `${volume}%` }} />
         </div>
+        <button className="player-bar__btn player-bar__expand" aria-label="fullscreen" onClick={onExpand}>{Icon.expand}</button>
       </div>
     </div>
   )

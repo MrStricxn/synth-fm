@@ -1,4 +1,5 @@
 import './TrackRow.css'
+import AddToPlaylistMenu from './AddToPlaylistMenu'
 
 function formatMs(ms) {
   if (!ms) return '--:--'
@@ -31,6 +32,7 @@ export default function TrackRow({ track, index, onPlay, onLike, isLiked, isActi
         <div className="track-row__artist">{track.artist}</div>
       </div>
       <span className="track-row__duration">{formatMs(duration)}</span>
+      <AddToPlaylistMenu track={track} />
       <button
         className="track-row__like"
         data-liked={String(isLiked)}

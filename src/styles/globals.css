@@ -21,6 +21,10 @@
   --brand-grad: linear-gradient(135deg, #9d4edd 0%, #e0509f 55%, #ff7a59 100%);
   --brand-soft: rgba(157, 78, 221, 0.16);
 
+  /* Dynamic colours derived from the current track artwork (r,g,b triplets) */
+  --dyn-1: 157, 78, 221;
+  --dyn-2: 224, 80, 159;
+
   /* Shape */
   --radius:    18px;
   --radius-sm: 12px;

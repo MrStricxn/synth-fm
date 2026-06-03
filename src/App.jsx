@@ -1,13 +1,18 @@
 import './App.css'
 import { usePlayerStore } from './store/usePlayerStore'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import SCWidget from './components/SCWidget'
 import ParticleField from './components/ParticleField'
+import DynamicBackground from './components/DynamicBackground'
+import NowPlaying from './components/NowPlaying'
 import TopBar from './components/TopBar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import PlayerBar from './components/PlayerBar'
 
 export default function App() {
+  useKeyboardShortcuts()
+
   const activeView       = usePlayerStore(s => s.activeView)
   const activePlaylistId = usePlayerStore(s => s.activePlaylistId)
   const playlists        = usePlayerStore(s => s.playlists)
@@ -23,7 +28,7 @@ export default function App() {
   const {
     setActiveView, setSearchQuery, createPlaylist,
     togglePlay, nextTrack, prevTrack, setProgress, setVolume,
-    toggleLike, isLiked, toggleShuffle, cycleRepeat,
+    toggleLike, isLiked, toggleShuffle, cycleRepeat, toggleFullscreen,
   } = usePlayerStore.getState()
 
   function handleNewPlaylist() {
@@ -40,6 +45,7 @@ export default function App() {
     <div className="app">
       <SCWidget />
       <ParticleField />
+      <DynamicBackground />
       <div className="app__grain" aria-hidden="true" />
       <TopBar searchQuery={searchQuery} onSearch={setSearchQuery} />
       <div className="app__body">
@@ -71,7 +77,9 @@ export default function App() {
         onLike={toggleLike}
         onShuffle={toggleShuffle}
         onRepeat={cycleRepeat}
+        onExpand={toggleFullscreen}
       />
+      <NowPlaying />
     </div>
   )
 }

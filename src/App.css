@@ -14,12 +14,13 @@
   inset: -25%;
   z-index: -2;
   background:
-    radial-gradient(38% 48% at 18% 22%, rgba(157, 78, 221, 0.32), transparent 70%),
-    radial-gradient(36% 44% at 82% 28%, rgba(224, 80, 159, 0.26), transparent 70%),
-    radial-gradient(44% 50% at 60% 88%, rgba(255, 122, 89, 0.18), transparent 72%),
-    radial-gradient(40% 40% at 30% 70%, rgba(120, 180, 255, 0.12), transparent 70%);
+    radial-gradient(38% 48% at 18% 22%, rgba(var(--dyn-1), 0.34), transparent 70%),
+    radial-gradient(36% 44% at 82% 28%, rgba(var(--dyn-2), 0.28), transparent 70%),
+    radial-gradient(44% 50% at 60% 88%, rgba(255, 122, 89, 0.16), transparent 72%),
+    radial-gradient(40% 40% at 30% 70%, rgba(120, 180, 255, 0.10), transparent 70%);
   filter: blur(50px);
   animation: drift 28s ease-in-out infinite;
+  transition: background 1.2s ease;
   pointer-events: none;
 }
 
@@ -31,13 +32,14 @@
   z-index: -2;
   background:
     conic-gradient(from 0deg at 50% 50%,
-      rgba(157, 78, 221, 0.10),
-      rgba(224, 80, 159, 0.06),
-      rgba(255, 122, 89, 0.08),
+      rgba(var(--dyn-1), 0.12),
+      rgba(var(--dyn-2), 0.07),
+      rgba(255, 122, 89, 0.07),
       rgba(120, 180, 255, 0.06),
-      rgba(157, 78, 221, 0.10));
+      rgba(var(--dyn-1), 0.12));
   filter: blur(80px);
   animation: aurora 40s linear infinite;
+  transition: background 1.2s ease;
   pointer-events: none;
 }
 

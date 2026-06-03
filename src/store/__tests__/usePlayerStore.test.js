@@ -144,3 +144,41 @@ describe('setVolume', () => {
     expect(usePlayerStore.getState().volume).toBe(60)
   })
 })
+
+describe('toggleMute', () => {
+  it('mutes and remembers the previous volume', () => {
+    usePlayerStore.setState({ volume: 70 })
+    usePlayerStore.getState().toggleMute()
+    expect(usePlayerStore.getState().volume).toBe(0)
+    expect(usePlayerStore.getState().prevVolume).toBe(70)
+  })
+  it('restores the previous volume when unmuting', () => {
+    usePlayerStore.setState({ volume: 70 })
+    usePlayerStore.getState().toggleMute()
+    usePlayerStore.getState().toggleMute()
+    expect(usePlayerStore.getState().volume).toBe(70)
+  })
+})
+
+describe('fullscreen', () => {
+  it('toggles fullscreen', () => {
+    expect(usePlayerStore.getState().fullscreen).toBe(false)
+    usePlayerStore.getState().toggleFullscreen()
+    expect(usePlayerStore.getState().fullscreen).toBe(true)
+  })
+  it('setFullscreen sets explicitly', () => {
+    usePlayerStore.getState().setFullscreen(true)
+    expect(usePlayerStore.getState().fullscreen).toBe(true)
+    usePlayerStore.getState().setFullscreen(false)
+    expect(usePlayerStore.getState().fullscreen).toBe(false)
+  })
+})
+
+describe('setProgress preserves duration', () => {
+  it('keeps the existing duration when called without one', () => {
+    usePlayerStore.setState({ duration: 180000 })
+    usePlayerStore.getState().setProgress(5000, 0)
+    expect(usePlayerStore.getState().duration).toBe(180000)
+    expect(usePlayerStore.getState().progress).toBe(5000)
+  })
+})
