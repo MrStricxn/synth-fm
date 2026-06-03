@@ -10,46 +10,88 @@ export default function SCWidget() {
   const isPlaying    = usePlayerStore(s => s.isPlaying)
   const volume       = usePlayerStore(s => s.volume)
 
+  // Initialize the SoundCloud widget once. The SC API script may not be ready
+  // at mount time (or may be blocked entirely), so we poll briefly for it and
+  // wrap everything so a player failure can never crash the whole app.
   useEffect(() => {
-    if (!iframeRef.current || !window.SC) return
-    const widget = window.SC.Widget(iframeRef.current)
-    widgetRef.current = widget
-    const Events = window.SC.Widget.Events
+    let cancelled = false
+    let pollId
 
-    widget.bind(Events.READY, () => { readyRef.current = true })
+    function init() {
+      try {
+        if (cancelled || !iframeRef.current || !window.SC?.Widget) return false
+        const widget = window.SC.Widget(iframeRef.current)
+        widgetRef.current = widget
+        const Events = window.SC.Widget.Events
 
-    widget.bind(Events.PLAY_PROGRESS, ({ currentPosition, duration }) => {
-      usePlayerStore.getState().setProgress(currentPosition, duration)
-    })
+        widget.bind(Events.READY, () => { readyRef.current = true })
+        widget.bind(Events.PLAY_PROGRESS, (e) => {
+          if (e) usePlayerStore.getState().setProgress(e.currentPosition, e.duration)
+        })
+        widget.bind(Events.FINISH, () => {
+          usePlayerStore.getState().nextTrack()
+        })
+        return true
+      } catch (err) {
+        console.error('SCWidget init failed:', err)
+        return false
+      }
+    }
 
-    widget.bind(Events.FINISH, () => {
-      usePlayerStore.getState().nextTrack()
-    })
+    if (!init()) {
+      // Poll for the SC API up to ~5s in case the external script loads late.
+      let attempts = 0
+      pollId = setInterval(() => {
+        attempts += 1
+        if (init() || attempts > 50) clearInterval(pollId)
+      }, 100)
+    }
+
+    return () => {
+      cancelled = true
+      if (pollId) clearInterval(pollId)
+    }
   }, [])
 
   useEffect(() => {
-    if (!widgetRef.current || !readyRef.current || !currentTrack) return
-    widgetRef.current.load(currentTrack.url, { auto_play: isPlaying })
+    try {
+      if (!widgetRef.current || !readyRef.current || !currentTrack) return
+      widgetRef.current.load(currentTrack.url, { auto_play: isPlaying })
+    } catch (err) {
+      console.error('SCWidget load failed:', err)
+    }
   }, [currentTrack])
 
   useEffect(() => {
-    if (!widgetRef.current || !readyRef.current || !currentTrack) return
-    if (isPlaying) {
-      widgetRef.current.play()
-    } else {
-      widgetRef.current.pause()
+    try {
+      if (!widgetRef.current || !readyRef.current || !currentTrack) return
+      if (isPlaying) {
+        widgetRef.current.play()
+      } else {
+        widgetRef.current.pause()
+      }
+    } catch (err) {
+      console.error('SCWidget play/pause failed:', err)
     }
   }, [isPlaying])
 
   useEffect(() => {
-    if (!widgetRef.current || !readyRef.current) return
-    widgetRef.current.setVolume(volume)
+    try {
+      if (!widgetRef.current || !readyRef.current) return
+      widgetRef.current.setVolume(volume)
+    } catch (err) {
+      console.error('SCWidget setVolume failed:', err)
+    }
   }, [volume])
 
   useEffect(() => {
     function onSeek(e) {
-      if (widgetRef.current && readyRef.current) {
-        widgetRef.current.seekTo(e.detail)
+      try {
+        if (widgetRef.current && readyRef.current) {
+          widgetRef.current.seekTo(e.detail)
+        }
+      } catch (err) {
+        console.error('SCWidget seek failed:', err)
       }
     }
     window.addEventListener('sc:seek', onSeek)

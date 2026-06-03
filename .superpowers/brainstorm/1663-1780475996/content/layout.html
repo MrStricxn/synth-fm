@@ -1,0 +1,123 @@
+<h2>Раскладка приложения — Synthwave Music Player</h2>
+<p class="subtitle">Полноценный UI с сайдбаром, основной областью и нижним плеером</p>
+
+<div class="mockup">
+  <div class="mockup-header">► SYNTH.FM — General Layout</div>
+  <div class="mockup-body" style="padding: 0; background: #0d0d0d; font-family: monospace; min-height: 380px; display: flex; flex-direction: column; border: 1px solid #ff6b35; box-shadow: 0 0 20px rgba(255,107,53,0.3);">
+
+    <!-- Top bar -->
+    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid #1a1a1a; background: #080808;">
+      <div style="color: #ff6b35; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 10px #ff6b35;">SYNTH.FM</div>
+      <div style="flex: 1; height: 22px; background: #111; border: 1px solid #222; border-radius: 2px; display: flex; align-items: center; padding: 0 10px; max-width: 360px;">
+        <span style="color: #555; font-size: 9px; letter-spacing: 1px;">⌕  SEARCH SOUNDCLOUD...</span>
+      </div>
+      <div style="margin-left: auto; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ff6b35, #ff0080); border: 1px solid #ff6b35; box-shadow: 0 0 8px #ff6b35;"></div>
+    </div>
+
+    <!-- Main area -->
+    <div style="display: flex; flex: 1;">
+
+      <!-- Sidebar -->
+      <div style="width: 140px; border-right: 1px solid #1a1a1a; background: #080808; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+        <div style="padding: 6px 14px; color: #ff6b35; font-size: 8px; letter-spacing: 2px; text-shadow: 0 0 6px #ff6b35; background: rgba(255,107,53,0.08);">◈  LIBRARY</div>
+        <div style="padding: 6px 14px; color: #555; font-size: 8px; letter-spacing: 1px;">♫  PLAYLISTS</div>
+        <div style="padding: 6px 14px; color: #555; font-size: 8px; letter-spacing: 1px;">⚡  DISCOVER</div>
+        <div style="padding: 6px 14px; color: #555; font-size: 8px; letter-spacing: 1px;">♥  LIKED</div>
+        <div style="margin: 8px 14px; height: 1px; background: #1a1a1a;"></div>
+        <div style="padding: 4px 14px; color: #333; font-size: 7px; letter-spacing: 1px;">PLAYLISTS</div>
+        <div style="padding: 5px 14px; color: #444; font-size: 7px;">+ Synthwave Mix</div>
+        <div style="padding: 5px 14px; color: #444; font-size: 7px;">+ Retrowave 80s</div>
+        <div style="padding: 5px 14px; color: #444; font-size: 7px;">+ Cyberpunk OST</div>
+      </div>
+
+      <!-- Main content -->
+      <div style="flex: 1; padding: 14px 16px; overflow: hidden;">
+        <div style="color: #ff6b35; font-size: 9px; letter-spacing: 2px; margin-bottom: 12px; text-shadow: 0 0 6px #ff6b35;">LIBRARY — 24 TRACKS</div>
+
+        <!-- Track grid -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
+          <div style="background: #111; border: 1px solid #1a1a1a; padding: 8px; cursor: pointer;">
+            <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #ff6b35 0%, #ff0080 50%, #7b2fff 100%); margin-bottom: 6px; box-shadow: 0 0 8px rgba(255,107,53,0.4);"></div>
+            <div style="color: #fff; font-size: 7px; margin-bottom: 2px;">Nightcall</div>
+            <div style="color: #ff6b35; font-size: 6px;">Kavinsky</div>
+          </div>
+          <div style="background: #111; border: 1px solid #1a1a1a; padding: 8px; cursor: pointer;">
+            <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #7b2fff 0%, #00d4ff 100%); margin-bottom: 6px; box-shadow: 0 0 8px rgba(123,47,255,0.4);"></div>
+            <div style="color: #fff; font-size: 7px; margin-bottom: 2px;">Turbo Killer</div>
+            <div style="color: #ff6b35; font-size: 6px;">Carpenter Brut</div>
+          </div>
+          <div style="background: #111; border: 1px solid #222; padding: 8px; opacity: 0.6;">
+            <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #00d4ff 0%, #1db954 100%); margin-bottom: 6px;"></div>
+            <div style="color: #fff; font-size: 7px; margin-bottom: 2px;">Hyperparadise</div>
+            <div style="color: #666; font-size: 6px;">Haiku Hands</div>
+          </div>
+          <div style="background: #111; border: 1px solid #222; padding: 8px; opacity: 0.6;">
+            <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #ff0080, #ff6b35); margin-bottom: 6px;"></div>
+            <div style="color: #fff; font-size: 7px; margin-bottom: 2px;">She's a Killer</div>
+            <div style="color: #666; font-size: 6px;">Miami Nights 1984</div>
+          </div>
+        </div>
+
+        <!-- Track list -->
+        <div style="color: #ff6b35; font-size: 9px; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 0 6px #ff6b35;">TRACKS</div>
+        <div style="display: flex; flex-direction: column; gap: 1px;">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2);">
+            <span style="color: #ff6b35; font-size: 8px; text-shadow: 0 0 6px #ff6b35;">▶</span>
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #ff6b35, #ff0080); flex-shrink: 0;"></div>
+            <div style="flex:1"><div style="color: #fff; font-size: 8px;">Nightcall</div><div style="color: #ff6b35; font-size: 6px;">Kavinsky</div></div>
+            <span style="color: #555; font-size: 7px;">3:41</span>
+            <span style="color: #ff6b35; font-size: 8px;">♥</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid transparent;">
+            <span style="color: #333; font-size: 8px;">02</span>
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #7b2fff, #00d4ff); flex-shrink: 0;"></div>
+            <div style="flex:1"><div style="color: #888; font-size: 8px;">Turbo Killer</div><div style="color: #555; font-size: 6px;">Carpenter Brut</div></div>
+            <span style="color: #555; font-size: 7px;">5:22</span>
+            <span style="color: #333; font-size: 8px;">♥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom player bar -->
+    <div style="border-top: 1px solid #ff6b35; background: #080808; padding: 8px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 -4px 20px rgba(255,107,53,0.2);">
+      <!-- Now playing -->
+      <div style="display: flex; align-items: center; gap: 8px; width: 180px; flex-shrink: 0;">
+        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #ff6b35, #ff0080); box-shadow: 0 0 10px #ff6b35; flex-shrink: 0;"></div>
+        <div>
+          <div style="color: #fff; font-size: 8px;">Nightcall</div>
+          <div style="color: #ff6b35; font-size: 7px;">Kavinsky</div>
+        </div>
+        <span style="color: #ff6b35; font-size: 10px; margin-left: 4px;">♥</span>
+      </div>
+      <!-- Controls -->
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: center; gap: 20px; color: #ff6b35; font-size: 13px;">
+          <span style="color: #555; cursor: pointer;">⇄</span>
+          <span style="color: #888; cursor: pointer;">⏮</span>
+          <span style="width: 28px; height: 28px; border-radius: 50%; background: #ff6b35; display: flex; align-items: center; justify-content: center; color: #000; font-size: 11px; cursor: pointer; box-shadow: 0 0 12px #ff6b35;">▶</span>
+          <span style="color: #888; cursor: pointer;">⏭</span>
+          <span style="color: #555; cursor: pointer;">↺</span>
+        </div>
+        <div style="width: 100%; max-width: 400px; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #555; font-size: 7px;">1:23</span>
+          <div style="flex: 1; height: 3px; background: #1a1a1a; border-radius: 2px; position: relative; cursor: pointer;">
+            <div style="width: 38%; height: 3px; background: #ff6b35; border-radius: 2px; box-shadow: 0 0 6px #ff6b35;"></div>
+            <div style="width: 8px; height: 8px; background: #ff6b35; border-radius: 50%; position: absolute; top: -2.5px; left: 38%; box-shadow: 0 0 8px #ff6b35;"></div>
+          </div>
+          <span style="color: #555; font-size: 7px;">3:41</span>
+        </div>
+      </div>
+      <!-- Volume -->
+      <div style="display: flex; align-items: center; gap: 8px; width: 120px; flex-shrink: 0; justify-content: flex-end;">
+        <span style="color: #555; font-size: 10px;">🔊</span>
+        <div style="width: 70px; height: 3px; background: #1a1a1a; border-radius: 2px;">
+          <div style="width: 70%; height: 3px; background: #ff6b35; border-radius: 2px; box-shadow: 0 0 4px #ff6b35;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p style="text-align:center; margin-top: 16px;" class="subtitle">Как тебе эта раскладка? Всё на месте, или что-то изменить?</p>
