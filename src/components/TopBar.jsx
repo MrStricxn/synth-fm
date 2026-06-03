@@ -1,5 +1,6 @@
 import './TopBar.css'
 import Logo from './Logo'
+import AccountButton from './AccountButton'
 
 export default function TopBar({ searchQuery, onSearch }) {
   return (
@@ -22,7 +23,7 @@ export default function TopBar({ searchQuery, onSearch }) {
           </button>
         )}
       </div>
-      <div className="topbar__avatar" aria-hidden="true">S</div>
+      <AccountButton />
     </header>
   )
 }

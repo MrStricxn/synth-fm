@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { usePlayerStore } from './store/usePlayerStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import AudioEngine from './components/AudioEngine'
+import AuthSync from './components/AuthSync'
 import Onboarding from './components/Onboarding'
 import MobileNav from './components/MobileNav'
 import ParticleField from './components/ParticleField'
@@ -52,6 +53,7 @@ export default function App() {
   return (
     <div className={`app${fullscreen ? ' app--fs' : ''}`}>
       <AudioEngine />
+      <AuthSync />
       {!onboarded && <Onboarding />}
       <ParticleField />
       <DynamicBackground />

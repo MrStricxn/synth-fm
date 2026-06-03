@@ -2,6 +2,10 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { SEED_TRACKS, SEED_ARTISTS } from '../data/library'
 import { trendingTracks, searchTracks, resolveSeed } from '../api/audius'
+import { supabase, isAuthConfigured } from '../api/supabase'
+
+// Debounced push of the user's library to Supabase (cloud sync).
+let _pushTimer = null
 
 function dedupe(tracks) {
   const seen = new Set()
@@ -68,6 +72,9 @@ const initialState = {
   prevVolume: 80,
   // Listening stats per track id: { plays, completed } — drives recommendations.
   stats: {},
+  // Auth (runtime only — never persisted).
+  user: null,
+  authReady: false,
 }
 
 export const usePlayerStore = create(
@@ -278,6 +285,93 @@ export const usePlayerStore = create(
       setGenres: (genres) => set({ genres }),
 
       completeOnboarding: (genres) => set({ genres, onboarded: true }),
+
+      // ── Auth (Supabase) ───────────────────────────────────────────────────
+      initAuth: async () => {
+        if (!isAuthConfigured) { set({ authReady: true }); return }
+        try {
+          const { data } = await supabase.auth.getSession()
+          const user = data?.session?.user || null
+          set({ user, authReady: true })
+          if (user) get().pullCloud(user.id)
+          supabase.auth.onAuthStateChange((_event, session) => {
+            const u = session?.user || null
+            set({ user: u })
+            if (u) get().pullCloud(u.id)
+          })
+        } catch {
+          set({ authReady: true })
+        }
+      },
+
+      signUpEmail: async (email, password) => {
+        if (!supabase) return { error: 'Auth не настроен' }
+        const { error } = await supabase.auth.signUp({ email, password })
+        return { error: error?.message || null }
+      },
+
+      signInEmail: async (email, password) => {
+        if (!supabase) return { error: 'Auth не настроен' }
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        return { error: error?.message || null }
+      },
+
+      signInOAuth: async (provider) => {
+        if (!supabase) return { error: 'Auth не настроен' }
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider, // 'google' | 'discord'
+          options: { redirectTo: window.location.origin },
+        })
+        return { error: error?.message || null }
+      },
+
+      signOut: async () => {
+        if (supabase) await supabase.auth.signOut()
+        set({ user: null })
+      },
+
+      // ── Cloud sync of liked / playlists / genres ──────────────────────────
+      pullCloud: async (userId) => {
+        if (!supabase) return
+        try {
+          const { data, error } = await supabase
+            .from('user_state')
+            .select('liked, playlists, genres')
+            .eq('user_id', userId)
+            .maybeSingle()
+          if (error) return
+          if (data) {
+            // Cloud is the source of truth on login → consistent across devices.
+            set({
+              liked: data.liked || [],
+              playlists: data.playlists || [],
+              genres: data.genres || [],
+              onboarded: true,
+            })
+          } else {
+            // First login on this account → seed the cloud from local state.
+            get().pushCloud(true)
+          }
+        } catch { /* offline / table missing — stay on local state */ }
+      },
+
+      pushCloud: (immediate = false) => {
+        const { user } = get()
+        if (!supabase || !user) return
+        clearTimeout(_pushTimer)
+        const run = async () => {
+          const { liked, playlists, genres } = get()
+          try {
+            await supabase.from('user_state').upsert({
+              user_id: user.id,
+              liked, playlists, genres,
+              updated_at: new Date().toISOString(),
+            })
+          } catch { /* ignore transient errors */ }
+        }
+        if (immediate) run()
+        else _pushTimer = setTimeout(run, 1200)
+      },
 
       setProgress: (progress, duration) => set(s => ({ progress, duration: duration || s.duration })),
 
