@@ -2,11 +2,6 @@ import './AuthModal.css'
 import { useState } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
 
-const Providers = {
-  google: <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#fff" d="M12 11v2.8h4c-.2 1-1.3 3-4 3a4.5 4.5 0 0 1 0-9c1.3 0 2.2.5 2.7 1l2-1.9A7.5 7.5 0 1 0 12 19.5c4.3 0 7.2-3 7.2-7.3 0-.5 0-.8-.1-1.2H12Z"/></svg>,
-  discord: <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M19.3 5.3A17 17 0 0 0 15 4l-.2.4a13 13 0 0 1 3.6 1.6 12 12 0 0 0-10.8 0A13 13 0 0 1 11.2 4.4L11 4a17 17 0 0 0-4.3 1.3C3.9 9.5 3.1 13.6 3.5 17.6a17 17 0 0 0 5.2 2.6l.6-1a11 11 0 0 1-1.8-.9l.4-.3a8.6 8.6 0 0 0 7.4 0l.4.3c-.5.4-1.2.7-1.8.9l.6 1a17 17 0 0 0 5.2-2.6c.5-4.6-.8-8.7-2.4-12.3ZM9.7 15.2c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7Zm4.6 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7Z"/></svg>,
-}
-
 export default function AuthModal({ onClose }) {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
@@ -27,30 +22,12 @@ export default function AuthModal({ onClose }) {
     else onClose()
   }
 
-  async function oauth(provider) {
-    setError('')
-    const { error } = await usePlayerStore.getState().signInOAuth(provider)
-    if (error) setError(error)
-    // On success the browser redirects to the provider.
-  }
-
   return (
     <div className="auth" onClick={onClose}>
       <div className="auth__card" onClick={e => e.stopPropagation()}>
         <button className="auth__close" aria-label="close" onClick={onClose}>✕</button>
         <h2 className="auth__title">{mode === 'signup' ? 'Регистрация' : 'Вход'}</h2>
         <p className="auth__sub">Синхронизируй лайки и плейлисты между устройствами.</p>
-
-        <div className="auth__oauth">
-          <button className="auth__provider auth__provider--google" onClick={() => oauth('google')}>
-            {Providers.google} Google
-          </button>
-          <button className="auth__provider auth__provider--discord" onClick={() => oauth('discord')}>
-            {Providers.discord} Discord
-          </button>
-        </div>
-
-        <div className="auth__divider"><span>или по почте</span></div>
 
         <form className="auth__form" onSubmit={submit}>
           <input className="auth__input" type="email" placeholder="Email" required
