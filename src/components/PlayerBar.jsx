@@ -1,4 +1,5 @@
 import './PlayerBar.css'
+import { useState, useRef } from 'react'
 
 function fmt(ms) {
   if (!ms && ms !== 0) return '--:--'
@@ -18,25 +19,57 @@ const Icon = {
   heart: (liked) => <svg viewBox="0 0 24 24" width="20" height="20" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20s-7-4.3-9.2-8.5C1.3 8.3 2.8 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.2 0 4.7 3.3 3.2 6.5C19 15.7 12 20 12 20Z"/></svg>,
 }
 
+function ratioFromEvent(el, clientX) {
+  const rect = el.getBoundingClientRect()
+  if (rect.width === 0) return 0
+  return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+}
+
 export default function PlayerBar({
   currentTrack, isPlaying, progress, duration, volume,
   isLiked, shuffle, repeat,
   onTogglePlay, onNext, onPrev, onSeek, onVolume, onLike, onShuffle, onRepeat,
 }) {
+  const seekRef = useRef(null)
+  const volRef = useRef(null)
+  const [scrub, setScrub] = useState(null) // 0..1 while dragging the seek bar
+
   if (!currentTrack) return <div className="player-bar" />
 
-  const pct = duration > 0 ? (progress / duration) * 100 : 0
+  const livePct = duration > 0 ? (progress / duration) * 100 : 0
+  const seekPct = scrub != null ? scrub * 100 : livePct
+  const shownProgress = scrub != null ? scrub * duration : progress
 
-  function handleSeekClick(e) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    onSeek(Math.floor(ratio * duration))
+  // ---- Seek: drag to scrub, commit on release (click works too) ----
+  function startSeek(e) {
+    if (!duration) return
+    e.preventDefault()
+    const apply = ev => setScrub(ratioFromEvent(seekRef.current, ev.clientX))
+    apply(e)
+    const move = ev => apply(ev)
+    const up = ev => {
+      const r = ratioFromEvent(seekRef.current, ev.clientX)
+      onSeek(Math.floor(r * duration))
+      setScrub(null)
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
   }
 
-  function handleVolumeClick(e) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-    onVolume(Math.round(ratio * 100))
+  // ---- Volume: drag for continuous control (click works too) ----
+  function startVolume(e) {
+    e.preventDefault()
+    const apply = ev => onVolume(Math.round(ratioFromEvent(volRef.current, ev.clientX) * 100))
+    apply(e)
+    const move = ev => apply(ev)
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
   }
 
   return (
@@ -74,10 +107,14 @@ export default function PlayerBar({
         </div>
 
         <div className="player-bar__progress">
-          <span className="player-bar__time">{fmt(progress)}</span>
-          <div className="player-bar__seek" onClick={handleSeekClick}>
-            <div className="player-bar__seek-fill" style={{ width: `${pct}%` }} />
-            <div className="player-bar__seek-thumb" style={{ left: `${pct}%` }} />
+          <span className="player-bar__time">{fmt(shownProgress)}</span>
+          <div
+            ref={seekRef}
+            className={`player-bar__seek${scrub != null ? ' scrubbing' : ''}`}
+            onPointerDown={startSeek}
+          >
+            <div className="player-bar__seek-fill" style={{ width: `${seekPct}%` }} />
+            <div className="player-bar__seek-thumb" style={{ left: `${seekPct}%` }} />
           </div>
           <span className="player-bar__time">{fmt(duration)}</span>
         </div>
@@ -85,7 +122,7 @@ export default function PlayerBar({
 
       <div className="player-bar__volume">
         <span className="player-bar__vol-icon">{Icon.volume}</span>
-        <div className="player-bar__vol-track" onClick={handleVolumeClick}>
+        <div ref={volRef} className="player-bar__vol-track" onPointerDown={startVolume}>
           <div className="player-bar__vol-fill" style={{ width: `${volume}%` }} />
           <div className="player-bar__vol-thumb" style={{ left: `${volume}%` }} />
         </div>
