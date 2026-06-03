@@ -57,6 +57,11 @@ export default function App() {
       {!onboarded && <Onboarding />}
       <ParticleField />
       <DynamicBackground />
+      <div className="app__horizon" aria-hidden="true">
+        <div className="app__sun" />
+        <div className="app__grid" />
+      </div>
+      <div className="app__scanlines" aria-hidden="true" />
       <div className="app__grain" aria-hidden="true" />
       <TopBar searchQuery={searchQuery} onSearch={setSearchQuery} />
       <div className="app__body">
