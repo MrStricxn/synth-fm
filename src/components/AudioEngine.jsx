@@ -39,6 +39,44 @@ export default function AudioEngine() {
     if (audio) audio.volume = Math.max(0, Math.min(1, volume / 100))
   }, [volume])
 
+  // Media Session API: lock-screen / notification controls + keeps audio alive
+  // when the browser is backgrounded on mobile.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+    const ms = navigator.mediaSession
+    if (currentTrack) {
+      try {
+        ms.metadata = new window.MediaMetadata({
+          title: currentTrack.title || '',
+          artist: currentTrack.artist || '',
+          album: 'SYNTH.FM',
+          artwork: currentTrack.artwork
+            ? [96, 192, 512].map(s => ({ src: currentTrack.artwork, sizes: `${s}x${s}`, type: 'image/jpeg' }))
+            : [],
+        })
+      } catch { /* MediaMetadata unsupported */ }
+    }
+    const st = () => usePlayerStore.getState()
+    const set = (action, fn) => { try { ms.setActionHandler(action, fn) } catch { /* unsupported action */ } }
+    set('play', () => st().togglePlay())
+    set('pause', () => st().togglePlay())
+    set('nexttrack', () => st().nextTrack())
+    set('previoustrack', () => st().prevTrack())
+    set('seekto', (e) => {
+      if (e.seekTime != null && audioRef.current) {
+        audioRef.current.currentTime = e.seekTime
+        st().setProgress(Math.round(e.seekTime * 1000), st().duration)
+      }
+    })
+  }, [currentTrack])
+
+  // Reflect play state on the lock screen.
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused'
+    }
+  }, [isPlaying])
+
   // Wire up media events + seek requests once.
   useEffect(() => {
     const audio = audioRef.current

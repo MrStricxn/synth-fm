@@ -76,13 +76,13 @@ export default function PlayerBar({
   return (
     <div className="player-bar">
       <div className="player-bar__track">
-        <div className="player-bar__art">
+        <div className="player-bar__art" onClick={onExpand} role="button" aria-label="expand">
           {currentTrack.artwork
             ? <img src={currentTrack.artwork} alt={currentTrack.title} />
             : <div className="player-bar__gradient" style={{ background: currentTrack.color }} />
           }
         </div>
-        <div className="player-bar__info">
+        <div className="player-bar__info" onClick={onExpand}>
           <div className="player-bar__title">{currentTrack.title}</div>
           <div className="player-bar__artist">{currentTrack.artist}</div>
         </div>

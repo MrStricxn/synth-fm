@@ -2,6 +2,7 @@ import './Onboarding.css'
 import { useState } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { AUDIUS_GENRES } from '../api/audius'
+import Logo from './Logo'
 
 // First-run genre picker. The chosen genres are stored per-browser and seed the
 // "Для тебя" recommendations, so each visitor gets a different starting feed.
@@ -21,7 +22,7 @@ export default function Onboarding() {
   return (
     <div className="onboarding">
       <div className="onboarding__card">
-        <div className="onboarding__logo">SYNTH<span>.FM</span></div>
+        <div className="onboarding__logo"><Logo size={34} withText /></div>
         <h1 className="onboarding__title">Что слушаем?</h1>
         <p className="onboarding__sub">Выбери пару жанров — соберём подборку под тебя. Это можно изменить позже.</p>
 

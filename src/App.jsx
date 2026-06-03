@@ -4,6 +4,7 @@ import { usePlayerStore } from './store/usePlayerStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import AudioEngine from './components/AudioEngine'
 import Onboarding from './components/Onboarding'
+import MobileNav from './components/MobileNav'
 import ParticleField from './components/ParticleField'
 import DynamicBackground from './components/DynamicBackground'
 import NowPlaying from './components/NowPlaying'
@@ -87,6 +88,7 @@ export default function App() {
         onRepeat={cycleRepeat}
         onExpand={toggleFullscreen}
       />
+      <MobileNav activeView={activeView} onNav={setActiveView} />
       <NowPlaying />
     </div>
   )

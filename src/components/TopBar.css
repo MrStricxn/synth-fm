@@ -114,3 +114,10 @@
   transition: transform 0.2s;
 }
 .topbar__avatar:hover { transform: scale(1.06); }
+
+@media (max-width: 820px) {
+  .topbar { height: 56px; padding: 0 14px; gap: 12px; padding-top: env(safe-area-inset-top); }
+  .topbar__avatar { display: none; }
+  .topbar__logo-text { display: none; } /* keep just the mark on small screens */
+  .topbar__search { max-width: none; height: 40px; }
+}
