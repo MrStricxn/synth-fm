@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { LIBRARY } from '../data/library'
 
 export default function SCWidget() {
   const iframeRef = useRef(null)
@@ -98,7 +99,7 @@ export default function SCWidget() {
     return () => window.removeEventListener('sc:seek', onSeek)
   }, [])
 
-  const initialSrc = 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/kavinsky/nightcall&color=%23bc13fe&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false'
+  const initialSrc = `https://w.soundcloud.com/player/?url=${encodeURIComponent(LIBRARY[0].url)}&color=%239d4edd&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false`
 
   return (
     <iframe

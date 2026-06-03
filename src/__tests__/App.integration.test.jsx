@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import App from '../App'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { LIBRARY } from '../data/library'
 
 beforeEach(() => {
   // Provide a minimal SC mock so SCWidget doesn't blow up
@@ -22,6 +23,6 @@ describe('App integration', () => {
 
   it('shows the library view with tracks by default', () => {
     render(<App />)
-    expect(screen.getAllByText('Nightcall').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(LIBRARY[0].title).length).toBeGreaterThanOrEqual(1)
   })
 })

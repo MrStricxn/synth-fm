@@ -20,7 +20,7 @@ describe('LibraryView', () => {
 
   it('renders TrackCards for tracks in grid', () => {
     render(<LibraryView {...props} />)
-    expect(screen.getAllByText('Nightcall').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(LIBRARY[0].title).length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows empty state when tracks is empty', () => {
