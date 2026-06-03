@@ -29,9 +29,20 @@ function makeSprite(rgb) {
 export default function ParticleField() {
   const canvasRef = useRef(null)
   const playingRef = useRef(false)
+  const pausedRef = useRef(false)
+  const kickRef = useRef(null)
   const isPlaying = usePlayerStore(s => s.isPlaying)
+  const fullscreen = usePlayerStore(s => s.fullscreen)
 
   useEffect(() => { playingRef.current = isPlaying }, [isPlaying])
+
+  // Pause the whole animation loop while the fullscreen player is open — it's
+  // hidden behind the overlay, and compositing it under a full-screen blur is
+  // the most expensive thing on the page.
+  useEffect(() => {
+    pausedRef.current = fullscreen
+    if (!fullscreen && kickRef.current) kickRef.current()
+  }, [fullscreen])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -72,6 +83,7 @@ export default function ParticleField() {
 
     function frame(t) {
       if (!running) return
+      if (pausedRef.current) { raf = 0; return } // halted while fullscreen
       ctx.clearRect(0, 0, w, h)
       ctx.globalCompositeOperation = 'lighter'
       const playing = playingRef.current
@@ -92,6 +104,9 @@ export default function ParticleField() {
       ctx.globalCompositeOperation = 'source-over'
       raf = requestAnimationFrame(frame)
     }
+
+    // Allow the fullscreen effect to restart the loop after a pause.
+    kickRef.current = () => { if (!raf && running && !reduce) raf = requestAnimationFrame(frame) }
 
     resize()
     window.addEventListener('resize', resize)

@@ -24,6 +24,7 @@ export default function App() {
   const volume           = usePlayerStore(s => s.volume)
   const shuffle          = usePlayerStore(s => s.shuffle)
   const repeat           = usePlayerStore(s => s.repeat)
+  const fullscreen       = usePlayerStore(s => s.fullscreen)
 
   const {
     setActiveView, setSearchQuery, createPlaylist,
@@ -42,7 +43,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app${fullscreen ? ' app--fs' : ''}`}>
       <SCWidget />
       <ParticleField />
       <DynamicBackground />
