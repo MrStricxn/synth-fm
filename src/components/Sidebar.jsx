@@ -26,12 +26,18 @@ const ICONS = {
       <path d="M12 20s-7-4.3-9.2-8.5C1.3 8.3 2.8 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.2 0 4.7 3.3 3.2 6.5C19 15.7 12 20 12 20Z" />
     </svg>
   ),
+  recommend: (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3 2.1 5.2L19.5 9l-4 3.7 1 5.6-4.5-2.7L7.5 18l1-5.6-4-3.7 5.4-.8L12 3Z" />
+    </svg>
+  ),
 }
 
 const NAV_ITEMS = [
   { view: 'library',   label: 'Коллекция'     },
   { view: 'playlists', label: 'Плейлисты'     },
-  { view: 'discover',  label: 'Новинки'       },
+  { view: 'discover',  label: 'Чарты'         },
+  { view: 'recommend', label: 'Для тебя'      },
   { view: 'liked',     label: 'Мне нравится'  },
 ]
 

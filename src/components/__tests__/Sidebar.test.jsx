@@ -12,7 +12,8 @@ describe('Sidebar', () => {
     render(<Sidebar activeView="library" playlists={[]} onNav={vi.fn()} onNewPlaylist={vi.fn()} />)
     expect(screen.getByText(/коллекци/i)).toBeInTheDocument()
     expect(screen.getByText(/плейлист/i)).toBeInTheDocument()
-    expect(screen.getByText(/новинк/i)).toBeInTheDocument()
+    expect(screen.getByText(/чарт/i)).toBeInTheDocument()
+    expect(screen.getByText(/для тебя/i)).toBeInTheDocument()
     expect(screen.getByText(/нравится/i)).toBeInTheDocument()
   })
 

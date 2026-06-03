@@ -68,7 +68,9 @@ export default function SCWidget() {
           usePlayerStore.getState().setProgress(e.currentPosition, dur)
         })
         widget.bind(Events.FINISH, () => {
-          usePlayerStore.getState().nextTrack()
+          const st = usePlayerStore.getState()
+          if (st.currentTrack) st.recordListen(st.currentTrack.id, true)
+          st.nextTrack()
         })
         return true
       } catch (err) {

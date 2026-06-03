@@ -44,6 +44,8 @@ const initialState = {
   searchQuery: '',
   fullscreen: false,
   prevVolume: 80,
+  // Listening stats per track id: { plays, completed } — drives recommendations.
+  stats: {},
 }
 
 export const usePlayerStore = create(
@@ -113,6 +115,20 @@ export const usePlayerStore = create(
 
       setDuration: (duration) => set({ duration }),
 
+      // Record a listen. completed=true means the track played to the end.
+      recordListen: (trackId, completed) => set(s => {
+        const cur = s.stats[trackId] || { plays: 0, completed: 0 }
+        return {
+          stats: {
+            ...s.stats,
+            [trackId]: {
+              plays: cur.plays + 1,
+              completed: cur.completed + (completed ? 1 : 0),
+            },
+          },
+        }
+      }),
+
       setVolume: (volume) => set({ volume }),
 
       toggleMute: () => set(s => (
@@ -134,7 +150,7 @@ export const usePlayerStore = create(
     {
       name: 'synthwave-player',
       storage: createJSONStorage(() => getSafeStorage()),
-      partialize: (s) => ({ liked: s.liked, playlists: s.playlists, volume: s.volume }),
+      partialize: (s) => ({ liked: s.liked, playlists: s.playlists, volume: s.volume, stats: s.stats }),
     }
   )
 )
