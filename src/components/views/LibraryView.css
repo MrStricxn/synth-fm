@@ -1,0 +1,5 @@
+.library-view { padding: 16px; overflow-y: auto; height: 100%; }
+.view-heading { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+.library-view__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+.library-view__list-heading { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+.library-view__empty { color: var(--text-muted); font-size: 11px; text-align: center; padding: 40px; letter-spacing: 2px; }
