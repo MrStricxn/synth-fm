@@ -1,0 +1,63 @@
+:root {
+  --bg-base:      #0a0a0f;
+  --bg-surface:   #06060e;
+  --bg-elevated:  #0d0d1a;
+  --border:       #1a1a2e;
+
+  --accent-purple: #bc13fe;
+  --accent-cyan:   #00fff9;
+  --accent-pink:   #ff0080;
+  --accent-orange: #ff6b35;
+  --accent-green:  #39ff14;
+
+  --text-primary: #ffffff;
+  --text-muted:   #6a6a8a;
+
+  --font: 'Courier New', Courier, monospace;
+
+  --glow-purple: 0 0 8px #bc13fe, 0 0 20px rgba(188,19,254,0.4);
+  --glow-cyan:   0 0 8px #00fff9, 0 0 20px rgba(0,255,249,0.3);
+  --glow-pink:   0 0 8px #ff0080, 0 0 20px rgba(255,0,128,0.3);
+  --glow-green:  0 0 8px #39ff14, 0 0 16px rgba(57,255,20,0.3);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  color: inherit;
+}
+
+input {
+  font-family: var(--font);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-purple);
+  box-shadow: var(--glow-purple);
+}
