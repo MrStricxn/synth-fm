@@ -34,6 +34,7 @@ export default function LikedView({ liked, currentTrack, onPlay, onLike }) {
               onLike={onLike}
               isLiked={true}
               isActive={currentTrack?.id === track.id}
+              duration={track.duration}
             />
           ))}
         </div>

@@ -1,7 +1,9 @@
 import './App.css'
+import { useEffect } from 'react'
 import { usePlayerStore } from './store/usePlayerStore'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
-import SCWidget from './components/SCWidget'
+import AudioEngine from './components/AudioEngine'
+import Onboarding from './components/Onboarding'
 import ParticleField from './components/ParticleField'
 import DynamicBackground from './components/DynamicBackground'
 import NowPlaying from './components/NowPlaying'
@@ -13,6 +15,10 @@ import PlayerBar from './components/PlayerBar'
 export default function App() {
   useKeyboardShortcuts()
 
+  // Kick off the live Audius catalogue once on mount.
+  useEffect(() => { usePlayerStore.getState().loadCatalogue() }, [])
+
+  const onboarded        = usePlayerStore(s => s.onboarded)
   const activeView       = usePlayerStore(s => s.activeView)
   const activePlaylistId = usePlayerStore(s => s.activePlaylistId)
   const playlists        = usePlayerStore(s => s.playlists)
@@ -44,7 +50,8 @@ export default function App() {
 
   return (
     <div className={`app${fullscreen ? ' app--fs' : ''}`}>
-      <SCWidget />
+      <AudioEngine />
+      {!onboarded && <Onboarding />}
       <ParticleField />
       <DynamicBackground />
       <div className="app__grain" aria-hidden="true" />

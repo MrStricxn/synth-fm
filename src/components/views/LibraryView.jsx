@@ -55,6 +55,7 @@ export default function LibraryView({ tracks, currentTrack, isPlaying, onPlay, o
             onLike={onLike}
             isLiked={isLiked(track.id)}
             isActive={currentTrack?.id === track.id}
+            duration={track.duration}
           />
         ))}
       </div>

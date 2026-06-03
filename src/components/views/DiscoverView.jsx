@@ -1,39 +1,44 @@
+import TrackCard from '../TrackCard'
 import TrackRow from '../TrackRow'
-import { CHARTS_RU, CHARTS_US } from '../../data/library'
+import PlayActions from '../PlayActions'
 import './views.css'
 
-function Chart({ title, accent, tracks, currentTrack, onPlay, onLike, isLiked }) {
-  return (
-    <>
-      <div className="view__section" style={{ color: accent }}>{title}</div>
-      <div className="view__list">
-        {tracks.map((track, i) => (
-          <TrackRow
-            key={track.id}
-            track={track}
-            index={i}
-            onPlay={t => onPlay(t, tracks)}
-            onLike={onLike}
-            isLiked={isLiked(track.id)}
-            isActive={currentTrack?.id === track.id}
-          />
-        ))}
+// Trending on Audius this week.
+export default function DiscoverView({ tracks, loading, currentTrack, isPlaying, onPlay, onLike, isLiked }) {
+  if (loading && !tracks.length) {
+    return (
+      <div className="view">
+        <div className="view__head"><h1 className="view__title view__title--grad">Чарты</h1></div>
+        <div className="view__loading">Загружаем тренды Audius…</div>
       </div>
-    </>
-  )
-}
+    )
+  }
 
-export default function DiscoverView({ currentTrack, onPlay, onLike, isLiked }) {
+  const grid = tracks.slice(0, 6)
+
   return (
     <div className="view">
       <div className="view__head">
         <h1 className="view__title view__title--grad">Чарты</h1>
-        <span className="view__sub">Популярное в России и США</span>
+        <span className="view__sub">Тренды Audius за неделю</span>
+        <PlayActions tracks={tracks} />
       </div>
-      <Chart title="🇷🇺 Популярное в России" accent="var(--brand-2)" tracks={CHARTS_RU}
-        currentTrack={currentTrack} onPlay={onPlay} onLike={onLike} isLiked={isLiked} />
-      <Chart title="🇺🇸 Популярное в США" accent="var(--accent-cyan)" tracks={CHARTS_US}
-        currentTrack={currentTrack} onPlay={onPlay} onLike={onLike} isLiked={isLiked} />
+
+      <div className="library-view__grid">
+        {grid.map(track => (
+          <TrackCard key={track.id} track={track} onPlay={t => onPlay(t, tracks)}
+            isPlaying={currentTrack?.id === track.id && isPlaying} />
+        ))}
+      </div>
+
+      <div className="view__section">Весь чарт</div>
+      <div className="view__list">
+        {tracks.map((track, i) => (
+          <TrackRow key={track.id} track={track} index={i} onPlay={t => onPlay(t, tracks)}
+            onLike={onLike} isLiked={isLiked(track.id)} isActive={currentTrack?.id === track.id}
+            duration={track.duration} />
+        ))}
+      </div>
     </div>
   )
 }

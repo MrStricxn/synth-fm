@@ -1,6 +1,18 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { LIBRARY } from '../data/library'
+import { SEED_TRACKS, SEED_ARTISTS } from '../data/library'
+import { trendingTracks, searchTracks, resolveSeed } from '../api/audius'
+
+function dedupe(tracks) {
+  const seen = new Set()
+  const out = []
+  for (const t of tracks) {
+    if (!t || seen.has(t.id)) continue
+    seen.add(t.id)
+    out.push(t)
+  }
+  return out
+}
 
 // Safe in-memory storage fallback for environments without localStorage
 const memoryStorage = (() => {
@@ -36,12 +48,22 @@ const initialState = {
   queueIndex: 0,
   shuffle: false,
   repeat: 'none',
-  library: LIBRARY,
+  library: SEED_TRACKS,
+  charts: SEED_TRACKS,
+  catalogueLoaded: false,
+  loadingCatalogue: false,
   playlists: [],
   liked: [],
   activeView: 'library',
   activePlaylistId: null,
   searchQuery: '',
+  searchResults: [],
+  searchLoading: false,
+  recommendations: [],
+  loadingRecs: false,
+  // Genre preferences from onboarding (persisted) — seed the recommendations.
+  genres: [],
+  onboarded: false,
   fullscreen: false,
   prevVolume: 80,
   // Listening stats per track id: { plays, completed } — drives recommendations.
@@ -180,7 +202,82 @@ export const usePlayerStore = create(
       // "stuck" behind search results.
       setActiveView: (view, playlistId = null) => set({ activeView: view, activePlaylistId: playlistId, searchQuery: '' }),
 
-      setSearchQuery: (q) => set({ searchQuery: q }),
+      // ── Audius: live catalogue ────────────────────────────────────────────
+      loadCatalogue: async () => {
+        if (get().catalogueLoaded || get().loadingCatalogue) return
+        set({ loadingCatalogue: true })
+        try {
+          const [trend, seed] = await Promise.all([
+            trendingTracks({ time: 'week', limit: 30 }).catch(() => []),
+            resolveSeed(SEED_ARTISTS, 2).catch(() => []),
+          ])
+          const library = dedupe([...trend, ...seed, ...SEED_TRACKS])
+          set({
+            library: library.length ? library : SEED_TRACKS,
+            charts: (trend.length ? trend : SEED_TRACKS),
+            catalogueLoaded: true,
+            loadingCatalogue: false,
+          })
+        } catch {
+          set({ loadingCatalogue: false })
+        }
+      },
+
+      // ── Audius: search (debounced from the UI) ────────────────────────────
+      setSearchQuery: (q) => {
+        set({ searchQuery: q })
+        const query = q.trim()
+        if (!query) { set({ searchResults: [], searchLoading: false }); return }
+        set({ searchLoading: true })
+        // Tag this request so a slower earlier one can't overwrite a newer one.
+        const token = (get()._searchToken || 0) + 1
+        set({ _searchToken: token })
+        searchTracks(query, 25)
+          .then(results => {
+            if (get()._searchToken === token) set({ searchResults: results, searchLoading: false })
+          })
+          .catch(() => {
+            if (get()._searchToken === token) set({ searchResults: [], searchLoading: false })
+          })
+      },
+
+      // ── Audius: personalised recommendations ──────────────────────────────
+      // Built from the user's liked artists, listening stats and onboarding
+      // genres. Every browser ends up with a different list because the inputs
+      // (likes / plays / picked genres) are per-user in localStorage.
+      loadRecommendations: async () => {
+        if (get().loadingRecs) return
+        set({ loadingRecs: true })
+        const { liked, stats, genres, library } = get()
+
+        // Rank liked + most-played artists as search seeds.
+        const artistWeight = {}
+        for (const t of liked) artistWeight[t.artist] = (artistWeight[t.artist] || 0) + 3
+        for (const [id, s] of Object.entries(stats || {})) {
+          const t = library.find(x => x.id === id)
+          if (t) artistWeight[t.artist] = (artistWeight[t.artist] || 0) + (s.completed || 0) * 2 + (s.plays || 0)
+        }
+        const topArtists = Object.entries(artistWeight).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([a]) => a)
+
+        try {
+          const jobs = []
+          for (const a of topArtists) jobs.push(searchTracks(a, 6).catch(() => []))
+          for (const g of (genres || []).slice(0, 3)) jobs.push(trendingTracks({ genre: g, limit: 8 }).catch(() => []))
+          // Cold start (no signal yet): fall back to overall trending.
+          if (!jobs.length) jobs.push(trendingTracks({ limit: 20 }).catch(() => []))
+
+          const batches = await Promise.all(jobs)
+          const likedIds = new Set(liked.map(t => t.id))
+          const recs = dedupe(batches.flat()).filter(t => !likedIds.has(t.id))
+          set({ recommendations: recs, loadingRecs: false })
+        } catch {
+          set({ loadingRecs: false })
+        }
+      },
+
+      setGenres: (genres) => set({ genres }),
+
+      completeOnboarding: (genres) => set({ genres, onboarded: true }),
 
       setProgress: (progress, duration) => set(s => ({ progress, duration: duration || s.duration })),
 
@@ -221,7 +318,7 @@ export const usePlayerStore = create(
     {
       name: 'synthwave-player',
       storage: createJSONStorage(() => getSafeStorage()),
-      partialize: (s) => ({ liked: s.liked, playlists: s.playlists, volume: s.volume, stats: s.stats }),
+      partialize: (s) => ({ liked: s.liked, playlists: s.playlists, volume: s.volume, stats: s.stats, genres: s.genres, onboarded: s.onboarded }),
     }
   )
 )

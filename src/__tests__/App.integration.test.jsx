@@ -4,15 +4,20 @@ import App from '../App'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { LIBRARY } from '../data/library'
 
+// The app now streams from Audius. Mock the API so tests never hit the network.
+vi.mock('../api/audius', () => ({
+  trendingTracks: vi.fn(() => Promise.resolve([])),
+  searchTracks: vi.fn(() => Promise.resolve([])),
+  resolveSeed: vi.fn(() => Promise.resolve([])),
+  getTrack: vi.fn(() => Promise.resolve(null)),
+  streamUrl: (id) => `https://audius.test/stream/${id}`,
+  colorFor: () => 'linear-gradient(135deg, #9d4edd 0%, #e0509f 100%)',
+  AUDIUS_GENRES: ['Electronic', 'Hip-Hop/Rap'],
+}))
+
 beforeEach(() => {
-  // Provide a minimal SC mock so SCWidget doesn't blow up
-  const mockWidget = { bind: vi.fn(), load: vi.fn(), play: vi.fn(), pause: vi.fn(), seekTo: vi.fn(), setVolume: vi.fn() }
-  window.SC = {
-    Widget: Object.assign(vi.fn(() => mockWidget), {
-      Events: { READY: 'ready', PLAY: 'play', PAUSE: 'pause', PLAY_PROGRESS: 'playProgress', FINISH: 'finish' },
-    }),
-  }
-  usePlayerStore.setState(usePlayerStore.getState().getInitialState())
+  // onboarded=true skips the first-run genre overlay.
+  usePlayerStore.setState({ ...usePlayerStore.getState().getInitialState(), onboarded: true })
 })
 
 describe('App integration', () => {
@@ -21,7 +26,7 @@ describe('App integration', () => {
     expect(screen.getByText('SYNTH')).toBeInTheDocument()
   })
 
-  it('shows the library view with tracks by default', () => {
+  it('shows the library view with seed tracks by default', () => {
     render(<App />)
     expect(screen.getAllByText(LIBRARY[0].title).length).toBeGreaterThanOrEqual(1)
   })

@@ -1,5 +1,4 @@
 import { usePlayerStore } from '../store/usePlayerStore'
-import { ALL_TRACKS } from '../data/library'
 import LibraryView from './views/LibraryView'
 import PlaylistView from './views/PlaylistView'
 import DiscoverView from './views/DiscoverView'
@@ -13,16 +12,22 @@ export default function MainContent() {
   const currentTrack     = usePlayerStore(s => s.currentTrack)
   const isPlaying        = usePlayerStore(s => s.isPlaying)
   const library          = usePlayerStore(s => s.library)
+  const charts           = usePlayerStore(s => s.charts)
+  const loadingCatalogue = usePlayerStore(s => s.loadingCatalogue)
   const playlists        = usePlayerStore(s => s.playlists)
   const liked            = usePlayerStore(s => s.liked)
-  const stats            = usePlayerStore(s => s.stats)
   const searchQuery      = usePlayerStore(s => s.searchQuery)
+  const searchResults    = usePlayerStore(s => s.searchResults)
+  const searchLoading    = usePlayerStore(s => s.searchLoading)
+  const recommendations  = usePlayerStore(s => s.recommendations)
+  const loadingRecs      = usePlayerStore(s => s.loadingRecs)
 
   const { playTrack, toggleLike, isLiked } = usePlayerStore.getState()
 
-  // Search is global — it overrides the active view and searches the whole catalogue.
+  // Search is global — it overrides the active view and queries Audius live.
   if (searchQuery.trim()) {
-    return <SearchResultsView query={searchQuery} tracks={ALL_TRACKS} currentTrack={currentTrack} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
+    return <SearchResultsView query={searchQuery} results={searchResults} loading={searchLoading}
+      currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
   }
 
   if (activeView === 'playlists') {
@@ -30,13 +35,13 @@ export default function MainContent() {
     return <PlaylistView playlist={playlist} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
   }
   if (activeView === 'discover') {
-    return <DiscoverView currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
+    return <DiscoverView tracks={charts} loading={loadingCatalogue} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
   }
   if (activeView === 'recommend') {
-    return <RecommendationsView catalog={ALL_TRACKS} liked={liked} stats={stats} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
+    return <RecommendationsView recs={recommendations} loading={loadingRecs} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
   }
   if (activeView === 'liked') {
     return <LikedView liked={liked} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} />
   }
-  return <LibraryView tracks={library} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
+  return <LibraryView tracks={library} loading={loadingCatalogue} currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />
 }

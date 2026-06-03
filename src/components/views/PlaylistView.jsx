@@ -65,6 +65,7 @@ export default function PlaylistView({ playlist, currentTrack, onPlay, onLike, i
               onLike={onLike}
               isLiked={isLiked(track.id)}
               isActive={currentTrack?.id === track.id}
+              duration={track.duration}
               onRemove={t => store.removeFromPlaylist(playlist.id, t.id)}
             />
           ))}
