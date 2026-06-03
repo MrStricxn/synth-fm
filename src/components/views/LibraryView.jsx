@@ -1,5 +1,6 @@
 import TrackCard from '../TrackCard'
 import TrackRow from '../TrackRow'
+import PlayActions from '../PlayActions'
 import './views.css'
 import './LibraryView.css'
 
@@ -29,6 +30,7 @@ export default function LibraryView({ tracks, currentTrack, isPlaying, onPlay, o
       <div className="view__head">
         <h1 className="view__title">Коллекция</h1>
         <span className="view__sub">{tracks.length} {plural(tracks.length)}</span>
+        <PlayActions tracks={tracks} />
       </div>
 
       <div className="library-view__grid">

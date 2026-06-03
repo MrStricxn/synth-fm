@@ -1,0 +1,35 @@
+.play-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.play-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.15s ease, filter 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+.play-actions button:active { transform: scale(0.96); }
+
+.play-actions__main {
+  color: #fff;
+  background: linear-gradient(135deg, #9d4edd, #e0509f 55%, #ff7a59, #9d4edd);
+  background-size: 220% 220%;
+  animation: gradient-shift 6s ease infinite;
+  box-shadow: var(--shadow-pop);
+}
+.play-actions__main:hover { transform: scale(1.04); filter: brightness(1.08); }
+
+.play-actions__shuffle {
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+}
+.play-actions__shuffle:hover { color: var(--text); background: var(--surface-active); }

@@ -70,7 +70,12 @@ export default function SCWidget() {
         widget.bind(Events.FINISH, () => {
           const st = usePlayerStore.getState()
           if (st.currentTrack) st.recordListen(st.currentTrack.id, true)
-          st.nextTrack()
+          const result = st.advanceAuto()
+          // repeat-one keeps the same URL, so loadCurrent() won't reload it —
+          // restart playback in place manually.
+          if (result === 'repeat-one') {
+            try { widget.seekTo(0); widget.play() } catch { /* noop */ }
+          }
         })
         return true
       } catch (err) {

@@ -81,6 +81,19 @@
   font-size: 14px;
 }
 .topbar__search-input::placeholder { color: var(--text-faint); }
+.topbar__search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  transition: color 0.18s, background 0.18s, transform 0.15s;
+}
+.topbar__search-clear:hover { color: var(--text); background: var(--surface-active); transform: scale(1.1); }
 
 .topbar__avatar {
   width: 38px;

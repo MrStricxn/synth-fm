@@ -1,4 +1,6 @@
 import TrackRow from '../TrackRow'
+import PlayActions from '../PlayActions'
+import { usePlayerStore } from '../../store/usePlayerStore'
 import './views.css'
 
 function plural(n) {
@@ -20,11 +22,31 @@ export default function PlaylistView({ playlist, currentTrack, onPlay, onLike, i
     )
   }
 
+  const store = usePlayerStore.getState()
+
+  function handleRename() {
+    const name = window.prompt('Новое название плейлиста:', playlist.name)
+    if (name?.trim()) store.renamePlaylist(playlist.id, name.trim())
+  }
+
+  function handleDelete() {
+    if (window.confirm(`Удалить плейлист «${playlist.name}»?`)) {
+      store.deletePlaylist(playlist.id)
+    }
+  }
+
   return (
     <div className="view">
       <div className="view__head">
         <h1 className="view__title view__title--grad">{playlist.name}</h1>
         <span className="view__sub">{playlist.tracks.length} {plural(playlist.tracks.length)}</span>
+        <div className="view__head-row">
+          <PlayActions tracks={playlist.tracks} />
+          <div className="view__head-tools">
+            <button className="view__tool" onClick={handleRename}>Переименовать</button>
+            <button className="view__tool view__tool--danger" onClick={handleDelete}>Удалить</button>
+          </div>
+        </div>
       </div>
 
       {playlist.tracks.length === 0 ? (
@@ -43,6 +65,7 @@ export default function PlaylistView({ playlist, currentTrack, onPlay, onLike, i
               onLike={onLike}
               isLiked={isLiked(track.id)}
               isActive={currentTrack?.id === track.id}
+              onRemove={t => store.removeFromPlaylist(playlist.id, t.id)}
             />
           ))}
         </div>

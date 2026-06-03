@@ -8,7 +8,7 @@ function formatMs(ms) {
   return `${m}:${String(s % 60).padStart(2, '0')}`
 }
 
-export default function TrackRow({ track, index, onPlay, onLike, isLiked, isActive = false, duration }) {
+export default function TrackRow({ track, index, onPlay, onLike, isLiked, isActive = false, duration, onRemove }) {
   return (
     <div className={`track-row${isActive ? ' active' : ''}`} onClick={() => onPlay(track)}>
       <span className="track-row__lead">
@@ -43,6 +43,15 @@ export default function TrackRow({ track, index, onPlay, onLike, isLiked, isActi
           <path d="M12 20s-7-4.3-9.2-8.5C1.3 8.3 2.8 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.2 0 4.7 3.3 3.2 6.5C19 15.7 12 20 12 20Z" />
         </svg>
       </button>
+      {onRemove && (
+        <button
+          className="track-row__remove"
+          aria-label="remove from playlist"
+          onClick={e => { e.stopPropagation(); onRemove(track) }}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      )}
     </div>
   )
 }

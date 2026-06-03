@@ -1,4 +1,5 @@
 import TrackRow from '../TrackRow'
+import PlayActions from '../PlayActions'
 import './views.css'
 
 function plural(n) {
@@ -14,6 +15,7 @@ export default function LikedView({ liked, currentTrack, onPlay, onLike }) {
       <div className="view__head">
         <h1 className="view__title view__title--grad">Мне нравится</h1>
         <span className="view__sub">{liked.length} {plural(liked.length)}</span>
+        <PlayActions tracks={liked} />
       </div>
 
       {liked.length === 0 ? (

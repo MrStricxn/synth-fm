@@ -182,3 +182,96 @@ describe('setProgress preserves duration', () => {
     expect(usePlayerStore.getState().progress).toBe(5000)
   })
 })
+
+describe('setActiveView clears search', () => {
+  it('resets searchQuery so navigation is never trapped behind search', () => {
+    usePlayerStore.setState({ searchQuery: 'oxxxymiron' })
+    usePlayerStore.getState().setActiveView('liked')
+    expect(usePlayerStore.getState().activeView).toBe('liked')
+    expect(usePlayerStore.getState().searchQuery).toBe('')
+  })
+})
+
+describe('playAll', () => {
+  it('queues the whole list and plays from the start', () => {
+    usePlayerStore.getState().playAll(LIBRARY)
+    const s = usePlayerStore.getState()
+    expect(s.queue).toEqual(LIBRARY)
+    expect(s.queueIndex).toBe(0)
+    expect(s.currentTrack).toEqual(LIBRARY[0])
+    expect(s.isPlaying).toBe(true)
+  })
+  it('turns shuffle on when started shuffled', () => {
+    usePlayerStore.getState().playAll(LIBRARY, true)
+    expect(usePlayerStore.getState().shuffle).toBe(true)
+    expect(usePlayerStore.getState().isPlaying).toBe(true)
+  })
+  it('does nothing for an empty list', () => {
+    usePlayerStore.getState().playAll([])
+    expect(usePlayerStore.getState().currentTrack).toBeNull()
+  })
+})
+
+describe('advanceAuto', () => {
+  it('replays the same track on repeat=one', () => {
+    usePlayerStore.setState({ queue: LIBRARY, queueIndex: 1, currentTrack: LIBRARY[1], repeat: 'one' })
+    const result = usePlayerStore.getState().advanceAuto()
+    expect(result).toBe('repeat-one')
+    expect(usePlayerStore.getState().queueIndex).toBe(1)
+    expect(usePlayerStore.getState().currentTrack).toEqual(LIBRARY[1])
+  })
+  it('stops at the end of the queue when repeat=none', () => {
+    usePlayerStore.setState({ queue: LIBRARY, queueIndex: LIBRARY.length - 1, currentTrack: LIBRARY.at(-1), repeat: 'none' })
+    const result = usePlayerStore.getState().advanceAuto()
+    expect(result).toBe('stop')
+    expect(usePlayerStore.getState().isPlaying).toBe(false)
+  })
+  it('wraps to the start at the end when repeat=all', () => {
+    usePlayerStore.setState({ queue: LIBRARY, queueIndex: LIBRARY.length - 1, currentTrack: LIBRARY.at(-1), repeat: 'all' })
+    const result = usePlayerStore.getState().advanceAuto()
+    expect(result).toBe('next')
+    expect(usePlayerStore.getState().queueIndex).toBe(0)
+  })
+  it('advances normally mid-queue', () => {
+    usePlayerStore.setState({ queue: LIBRARY, queueIndex: 0, currentTrack: LIBRARY[0], repeat: 'none' })
+    usePlayerStore.getState().advanceAuto()
+    expect(usePlayerStore.getState().queueIndex).toBe(1)
+  })
+})
+
+describe('shuffle next never repeats the current track', () => {
+  it('picks a different index every time on a 2-track queue', () => {
+    const two = LIBRARY.slice(0, 2)
+    usePlayerStore.setState({ queue: two, queueIndex: 0, currentTrack: two[0], shuffle: true })
+    for (let i = 0; i < 20; i++) {
+      usePlayerStore.setState({ queueIndex: 0, currentTrack: two[0] })
+      usePlayerStore.getState().nextTrack()
+      expect(usePlayerStore.getState().queueIndex).toBe(1)
+    }
+  })
+})
+
+describe('playlist management', () => {
+  it('removes a track from a playlist', () => {
+    usePlayerStore.getState().createPlaylist('Mix')
+    const pid = usePlayerStore.getState().playlists[0].id
+    usePlayerStore.getState().addToPlaylist(pid, track)
+    usePlayerStore.getState().removeFromPlaylist(pid, track.id)
+    expect(usePlayerStore.getState().playlists[0].tracks).toHaveLength(0)
+  })
+  it('renames a playlist', () => {
+    usePlayerStore.getState().createPlaylist('Old')
+    const pid = usePlayerStore.getState().playlists[0].id
+    usePlayerStore.getState().renamePlaylist(pid, 'New')
+    expect(usePlayerStore.getState().playlists[0].name).toBe('New')
+  })
+  it('deletes a playlist and resets the view if it was open', () => {
+    usePlayerStore.getState().createPlaylist('Temp')
+    const pid = usePlayerStore.getState().playlists[0].id
+    usePlayerStore.getState().setActiveView('playlists', pid)
+    usePlayerStore.getState().deletePlaylist(pid)
+    expect(usePlayerStore.getState().playlists).toHaveLength(0)
+    expect(usePlayerStore.getState().activeView).toBe('library')
+    expect(usePlayerStore.getState().activePlaylistId).toBeNull()
+  })
+})

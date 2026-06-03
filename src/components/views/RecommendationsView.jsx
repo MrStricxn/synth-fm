@@ -1,5 +1,6 @@
 import TrackCard from '../TrackCard'
 import TrackRow from '../TrackRow'
+import PlayActions from '../PlayActions'
 import { recommend } from '../../utils/recommend'
 import './views.css'
 
@@ -27,6 +28,7 @@ export default function RecommendationsView({ catalog, liked, stats, currentTrac
         <span className="view__sub">
           {hasSignal ? 'Подобрано по твоим лайкам и прослушиваниям' : 'Начни слушать — подборка станет точнее'}
         </span>
+        <PlayActions tracks={recs} />
       </div>
 
       <div className="library-view__grid">

@@ -8,10 +8,36 @@
 .view__head {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 8px 14px;
   margin-bottom: 22px;
   animation: fade-up 0.5s ease both;
 }
+/* Actions always drop onto their own line under the title. */
+.view__head > .play-actions,
+.view__head-row { flex-basis: 100%; }
+
+.view__head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.view__head-tools { display: flex; gap: 8px; }
+.view__tool {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  transition: color 0.18s, background 0.18s, transform 0.15s;
+}
+.view__tool:hover { color: var(--text); background: var(--surface-active); transform: translateY(-1px); }
+.view__tool--danger:hover { color: #ff6b6b; }
 
 .view__title {
   font-family: var(--font-display);

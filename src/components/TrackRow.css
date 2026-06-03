@@ -102,3 +102,18 @@
   opacity: 1;
   color: var(--brand-2);
 }
+
+.track-row__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: color 0.18s, opacity 0.18s, background 0.18s, transform 0.18s;
+}
+.track-row:hover .track-row__remove { opacity: 1; }
+.track-row__remove:hover { color: #ff6b6b; background: var(--surface-hover); transform: scale(1.12); }
