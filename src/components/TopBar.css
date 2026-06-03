@@ -1,0 +1,8 @@
+.topbar { display: flex; align-items: center; gap: 16px; padding: 0 16px; height: 48px; background: var(--bg-surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.topbar__logo { font-size: 16px; font-weight: bold; letter-spacing: 4px; white-space: nowrap; }
+.topbar__logo-synth { color: var(--accent-purple); text-shadow: var(--glow-purple); }
+.topbar__logo-fm { color: var(--accent-cyan); text-shadow: var(--glow-cyan); }
+.topbar__search { flex: 1; max-width: 420px; height: 28px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); padding: 0 12px; font-size: 11px; letter-spacing: 1px; outline: none; transition: border-color 0.2s; }
+.topbar__search::placeholder { color: var(--text-muted); }
+.topbar__search:focus { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(188,19,254,0.2); }
+.topbar__avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); border: 1px solid var(--accent-purple); box-shadow: var(--glow-purple); margin-left: auto; flex-shrink: 0; }
