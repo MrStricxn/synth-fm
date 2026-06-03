@@ -1,0 +1,4 @@
+.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
+.app::after { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 9999; }
+.app__body { display: flex; flex: 1; overflow: hidden; }
+.app__main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
