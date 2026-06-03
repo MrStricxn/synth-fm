@@ -25,3 +25,10 @@ dist-ssr
 
 # Coverage
 coverage
+
+# Superpowers brainstorm artifacts
+.superpowers/
+
+# Scaffold scratch files
+vite_out.txt
+vite_err.txt

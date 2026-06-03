@@ -1,6 +1,0 @@
-
-> npx
-> create-vite . --template react
-
-—  Operation cancelled
-
