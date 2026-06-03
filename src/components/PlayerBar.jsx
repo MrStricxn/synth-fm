@@ -97,7 +97,7 @@ export default function PlayerBar({
         <div className="player-bar__controls">
           <button className={`player-bar__btn${shuffle ? ' active' : ''}`} aria-label="shuffle" onClick={onShuffle}>{Icon.shuffle}</button>
           <button className="player-bar__btn" aria-label="prev" onClick={onPrev}>{Icon.prev}</button>
-          <button className="player-bar__play" aria-label={isPlaying ? 'pause' : 'play'} onClick={onTogglePlay}>
+          <button className={`player-bar__play${isPlaying ? ' playing' : ''}`} aria-label={isPlaying ? 'pause' : 'play'} onClick={onTogglePlay}>
             {isPlaying ? Icon.pause : Icon.play}
           </button>
           <button className="player-bar__btn" aria-label="next" onClick={onNext}>{Icon.next}</button>

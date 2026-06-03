@@ -1,6 +1,7 @@
 import './App.css'
 import { usePlayerStore } from './store/usePlayerStore'
 import SCWidget from './components/SCWidget'
+import ParticleField from './components/ParticleField'
 import TopBar from './components/TopBar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
@@ -38,6 +39,8 @@ export default function App() {
   return (
     <div className="app">
       <SCWidget />
+      <ParticleField />
+      <div className="app__grain" aria-hidden="true" />
       <TopBar searchQuery={searchQuery} onSearch={setSearchQuery} />
       <div className="app__body">
         <Sidebar

@@ -1,10 +1,19 @@
 .player-bar {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 24px;
   padding: 0 20px;
+  margin: 0 8px 8px;
   height: 84px;
   flex-shrink: 0;
+  background: rgba(18, 16, 26, 0.66);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 -2px 40px rgba(157, 78, 221, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* ---- Left: track info ---- */
@@ -104,6 +113,7 @@
 }
 
 .player-bar__play {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,13 +121,26 @@
   height: 44px;
   border-radius: 50%;
   color: #fff;
-  background: var(--brand-grad);
+  background: linear-gradient(135deg, #9d4edd, #e0509f 55%, #ff7a59, #9d4edd);
+  background-size: 220% 220%;
+  animation: gradient-shift 6s ease infinite;
   box-shadow: var(--shadow-pop);
   flex-shrink: 0;
   transition: transform 0.15s ease, filter 0.18s;
 }
 .player-bar__play:hover { transform: scale(1.07); filter: brightness(1.08); }
 .player-bar__play:active { transform: scale(0.96); }
+/* Pulsing ring while playing */
+.player-bar__play.playing::before,
+.player-bar__play.playing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--brand-2);
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+.player-bar__play.playing::after { animation-delay: 1.2s; }
 
 .player-bar__progress {
   display: flex;
@@ -151,7 +174,9 @@
 }
 .player-bar__seek-fill {
   height: 100%;
-  background: var(--brand-grad);
+  background: linear-gradient(90deg, #9d4edd, #e0509f, #ff7a59, #9d4edd);
+  background-size: 220% 100%;
+  animation: gradient-shift 5s ease infinite;
   border-radius: 999px;
   pointer-events: none;
 }

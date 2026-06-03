@@ -1,4 +1,6 @@
 .topbar {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -18,7 +20,9 @@
   width: 28px;
   height: 28px;
   border-radius: 9px;
-  background: var(--brand-grad);
+  background: linear-gradient(135deg, #9d4edd, #e0509f 55%, #ff7a59, #9d4edd);
+  background-size: 220% 220%;
+  animation: gradient-shift 7s ease infinite, float-y 4s ease-in-out infinite;
   box-shadow: var(--shadow-pop);
   position: relative;
 }
@@ -39,7 +43,9 @@
 }
 .topbar__logo-synth { color: var(--text); }
 .topbar__logo-fm {
-  background: var(--brand-grad);
+  background: linear-gradient(135deg, #9d4edd, #e0509f 55%, #ff7a59, #9d4edd);
+  background-size: 220% 220%;
+  animation: gradient-shift 7s ease infinite;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -53,7 +59,9 @@
   align-items: center;
   gap: 10px;
   padding: 0 16px;
-  background: var(--bg-elevated);
+  background: rgba(22, 20, 32, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border);
   border-radius: 999px;
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
