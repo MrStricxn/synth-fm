@@ -15,6 +15,12 @@ vi.mock('../api/audius', () => ({
   AUDIUS_GENRES: ['Electronic', 'Hip-Hop/Rap'],
 }))
 
+vi.mock('../api/hearthis', () => ({
+  searchTracks: vi.fn(() => Promise.resolve([])),
+  resolveSeed: vi.fn(() => Promise.resolve([])),
+  normalizeTrack: vi.fn(),
+}))
+
 beforeEach(() => {
   // onboarded=true skips the first-run genre overlay.
   usePlayerStore.setState({ ...usePlayerStore.getState().getInitialState(), onboarded: true })

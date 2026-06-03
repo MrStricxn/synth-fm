@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { SEED_TRACKS, SEED_ARTISTS } from '../data/library'
+import { SEED_TRACKS, SEED_ARTISTS, CIS_ARTISTS } from '../data/library'
 import { trendingTracks, searchTracks, resolveSeed } from '../api/audius'
+import * as hearthis from '../api/hearthis'
 import { supabase, isAuthConfigured } from '../api/supabase'
 
 // Debounced push of the user's library to Supabase (cloud sync).
@@ -214,11 +215,13 @@ export const usePlayerStore = create(
         if (get().catalogueLoaded || get().loadingCatalogue) return
         set({ loadingCatalogue: true })
         try {
-          const [trend, seed] = await Promise.all([
-            trendingTracks({ time: 'week', limit: 30 }).catch(() => []),
+          const [trend, seed, cis] = await Promise.all([
+            trendingTracks({ time: 'week', limit: 25 }).catch(() => []),
             resolveSeed(SEED_ARTISTS, 2).catch(() => []),
+            hearthis.resolveSeed(CIS_ARTISTS, 3).catch(() => []),
           ])
-          const library = dedupe([...trend, ...seed, ...SEED_TRACKS])
+          // CIS first so Russian rap (proper titles) leads the library.
+          const library = dedupe([...cis, ...trend, ...seed, ...SEED_TRACKS])
           set({
             library: library.length ? library : SEED_TRACKS,
             charts: (trend.length ? trend : SEED_TRACKS),
@@ -239,9 +242,13 @@ export const usePlayerStore = create(
         // Tag this request so a slower earlier one can't overwrite a newer one.
         const token = (get()._searchToken || 0) + 1
         set({ _searchToken: token })
-        searchTracks(query, 25)
-          .then(results => {
-            if (get()._searchToken === token) set({ searchResults: results, searchLoading: false })
+        // Query both sources; hearthis (CIS) results lead, Audius (global) follow.
+        Promise.all([
+          hearthis.searchTracks(query, 20).catch(() => []),
+          searchTracks(query, 20).catch(() => []),
+        ])
+          .then(([cis, audius]) => {
+            if (get()._searchToken === token) set({ searchResults: dedupe([...cis, ...audius]), searchLoading: false })
           })
           .catch(() => {
             if (get()._searchToken === token) set({ searchResults: [], searchLoading: false })
@@ -268,7 +275,10 @@ export const usePlayerStore = create(
 
         try {
           const jobs = []
-          for (const a of topArtists) jobs.push(searchTracks(a, 6).catch(() => []))
+          for (const a of topArtists) {
+            jobs.push(hearthis.searchTracks(a, 4).catch(() => []))
+            jobs.push(searchTracks(a, 4).catch(() => []))
+          }
           for (const g of (genres || []).slice(0, 3)) jobs.push(trendingTracks({ genre: g, limit: 8 }).catch(() => []))
           // Cold start (no signal yet): fall back to overall trending.
           if (!jobs.length) jobs.push(trendingTracks({ limit: 20 }).catch(() => []))

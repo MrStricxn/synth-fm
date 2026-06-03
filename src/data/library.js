@@ -32,6 +32,14 @@ export const SEED_ARTISTS = [
   'drum and bass', 'jungle', 'memphis phonk',
 ]
 
+// CIS / Russian-rap seed terms resolved against hearthis.at (better RU coverage
+// + accurate titles than Audius).
+export const CIS_ARTISTS = [
+  'oxxxymiron', 'miyagi andy panda', 'pharaoh', 'skriptonit', 'big baby tape',
+  'kizaru', 'basta', 'morgenshtern', 'jah khalib', 'noize mc',
+  'face', 'obladaet', 'og buda', 't-fest', 'gone fludd', 'scriptonite',
+]
+
 // Backwards-compatible exports (consumed by store/tests/views).
 export const LIBRARY = SEED_TRACKS
 export const ALL_TRACKS = SEED_TRACKS
