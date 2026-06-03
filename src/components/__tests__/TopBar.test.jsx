@@ -11,13 +11,13 @@ describe('TopBar', () => {
 
   it('renders search input', () => {
     render(<TopBar searchQuery="" onSearch={vi.fn()} />)
-    expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/исполнитель/i)).toBeInTheDocument()
   })
 
   it('calls onSearch when input changes', () => {
     const onSearch = vi.fn()
     render(<TopBar searchQuery="" onSearch={onSearch} />)
-    fireEvent.change(screen.getByPlaceholderText(/search/i), { target: { value: 'kavinsky' } })
+    fireEvent.change(screen.getByPlaceholderText(/исполнитель/i), { target: { value: 'kavinsky' } })
     expect(onSearch).toHaveBeenCalledWith('kavinsky')
   })
 

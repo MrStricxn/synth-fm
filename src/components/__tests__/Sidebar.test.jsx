@@ -10,16 +10,16 @@ const playlists = [
 describe('Sidebar', () => {
   it('renders all nav items', () => {
     render(<Sidebar activeView="library" playlists={[]} onNav={vi.fn()} onNewPlaylist={vi.fn()} />)
-    expect(screen.getByText(/library/i)).toBeInTheDocument()
-    expect(screen.getByText(/playlists/i)).toBeInTheDocument()
-    expect(screen.getByText(/discover/i)).toBeInTheDocument()
-    expect(screen.getByText(/liked/i)).toBeInTheDocument()
+    expect(screen.getByText(/коллекци/i)).toBeInTheDocument()
+    expect(screen.getByText(/плейлист/i)).toBeInTheDocument()
+    expect(screen.getByText(/новинк/i)).toBeInTheDocument()
+    expect(screen.getByText(/нравится/i)).toBeInTheDocument()
   })
 
   it('calls onNav with correct view when nav item clicked', () => {
     const onNav = vi.fn()
     render(<Sidebar activeView="library" playlists={[]} onNav={onNav} onNewPlaylist={vi.fn()} />)
-    fireEvent.click(screen.getByText(/liked/i))
+    fireEvent.click(screen.getByText(/нравится/i))
     expect(onNav).toHaveBeenCalledWith('liked', null)
   })
 

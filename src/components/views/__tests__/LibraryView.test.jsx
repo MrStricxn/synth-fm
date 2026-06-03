@@ -15,7 +15,7 @@ const props = {
 describe('LibraryView', () => {
   it('renders library heading', () => {
     render(<LibraryView {...props} />)
-    expect(screen.getByText(/library/i)).toBeInTheDocument()
+    expect(screen.getByText(/коллекци/i)).toBeInTheDocument()
   })
 
   it('renders TrackCards for tracks in grid', () => {
@@ -25,6 +25,6 @@ describe('LibraryView', () => {
 
   it('shows empty state when tracks is empty', () => {
     render(<LibraryView {...props} tracks={[]} />)
-    expect(screen.getByText(/no tracks/i)).toBeInTheDocument()
+    expect(screen.getByText(/не найдено/i)).toBeInTheDocument()
   })
 })

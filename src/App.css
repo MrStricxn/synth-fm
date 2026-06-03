@@ -1,4 +1,41 @@
-.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
-.app::after { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 9999; }
-.app__body { display: flex; flex: 1; overflow: hidden; }
-.app__main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ambient drifting glow — the signature atmospheric background */
+.app::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  background:
+    radial-gradient(40% 50% at 18% 22%, rgba(157, 78, 221, 0.30), transparent 70%),
+    radial-gradient(38% 46% at 82% 30%, rgba(224, 80, 159, 0.24), transparent 70%),
+    radial-gradient(45% 50% at 60% 88%, rgba(255, 122, 89, 0.16), transparent 72%);
+  filter: blur(40px);
+  animation: drift 26s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.app__body {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  padding: 8px 8px 0;
+  overflow: hidden;
+}
+
+.app__main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}

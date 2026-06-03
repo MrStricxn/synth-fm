@@ -1,24 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg-base:      #0a0a0f;
-  --bg-surface:   #06060e;
-  --bg-elevated:  #0d0d1a;
-  --border:       #1a1a2e;
+  /* Surfaces */
+  --bg:            #0c0b0f;
+  --bg-elevated:   #161420;
+  --bg-elevated-2: #1f1c2b;
+  --surface-hover: rgba(255, 255, 255, 0.055);
+  --surface-active: rgba(255, 255, 255, 0.09);
+  --border:        rgba(255, 255, 255, 0.07);
 
-  --accent-purple: #bc13fe;
-  --accent-cyan:   #00fff9;
-  --accent-pink:   #ff0080;
-  --accent-orange: #ff6b35;
-  --accent-green:  #39ff14;
+  /* Text */
+  --text:        #f5f3fa;
+  --text-muted:  #9a94ab;
+  --text-faint:  #6c6680;
 
-  --text-primary: #ffffff;
-  --text-muted:   #6a6a8a;
+  /* Brand gradient — violet -> magenta -> coral */
+  --brand-1: #9d4edd;
+  --brand-2: #e0509f;
+  --brand-3: #ff7a59;
+  --brand-grad: linear-gradient(135deg, #9d4edd 0%, #e0509f 55%, #ff7a59 100%);
+  --brand-soft: rgba(157, 78, 221, 0.16);
 
-  --font: 'Courier New', Courier, monospace;
+  /* Shape */
+  --radius:    18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
 
-  --glow-purple: 0 0 8px #bc13fe, 0 0 20px rgba(188,19,254,0.4);
-  --glow-cyan:   0 0 8px #00fff9, 0 0 20px rgba(0,255,249,0.3);
-  --glow-pink:   0 0 8px #ff0080, 0 0 20px rgba(255,0,128,0.3);
-  --glow-green:  0 0 8px #39ff14, 0 0 16px rgba(57,255,20,0.3);
+  --font-display: 'Unbounded', sans-serif;
+  --font: 'Golos Text', sans-serif;
+
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-pop:  0 8px 24px rgba(157, 78, 221, 0.35);
 }
 
 *, *::before, *::after {
@@ -33,10 +45,12 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg-base);
-  color: var(--text-primary);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button {
@@ -51,13 +65,43 @@ input {
   font-family: var(--font);
 }
 
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-surface);
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-purple);
-  box-shadow: var(--glow-purple);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); background-clip: content-box; }
+
+/* ---------- Keyframes ---------- */
+@keyframes drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(6%, -4%) scale(1.08); }
+  66%  { transform: translate(-5%, 5%) scale(0.96); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
