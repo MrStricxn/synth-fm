@@ -51,14 +51,28 @@ export async function searchTracks(query, limit = 20) {
   return data.filter(playable).map(normalizeTrack)
 }
 
-// Resolve several CIS search terms to a few tracks each, in parallel.
+// Run async fn over items with limited concurrency (hearthis rate-limits ~429
+// if you fire 20+ requests at once).
+async function mapLimit(items, limit, fn) {
+  const out = []
+  let i = 0
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (i < items.length) {
+      const idx = i++
+      try { out[idx] = await fn(items[idx]) } catch { out[idx] = [] }
+    }
+  })
+  await Promise.all(workers)
+  return out
+}
+
+// Resolve several CIS search terms to a few tracks each (staged concurrency).
 export async function resolveSeed(terms, perTerm = 3) {
-  const results = await Promise.allSettled(terms.map(q => searchTracks(q, perTerm)))
+  const results = await mapLimit(terms, 5, q => searchTracks(q, perTerm))
   const seen = new Set()
   const out = []
-  for (const r of results) {
-    if (r.status !== 'fulfilled') continue
-    for (const t of r.value) {
+  for (const list of results) {
+    for (const t of (list || [])) {
       if (seen.has(t.id)) continue
       seen.add(t.id)
       out.push(t)

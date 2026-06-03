@@ -215,13 +215,14 @@ export const usePlayerStore = create(
         if (get().catalogueLoaded || get().loadingCatalogue) return
         set({ loadingCatalogue: true })
         try {
-          const [trend, seed, cis] = await Promise.all([
+          const [trend, seed, cisHt, cisAu] = await Promise.all([
             trendingTracks({ time: 'week', limit: 25 }).catch(() => []),
             resolveSeed(SEED_ARTISTS, 2).catch(() => []),
-            hearthis.resolveSeed(CIS_ARTISTS, 3).catch(() => []),
+            hearthis.resolveSeed(CIS_ARTISTS, 2).catch(() => []),  // CIS via hearthis
+            resolveSeed(CIS_ARTISTS, 1).catch(() => []),           // CIS via Audius (complements hearthis)
           ])
           // CIS first so Russian rap (proper titles) leads the library.
-          const library = dedupe([...cis, ...trend, ...seed, ...SEED_TRACKS])
+          const library = dedupe([...cisHt, ...cisAu, ...trend, ...seed, ...SEED_TRACKS])
           set({
             library: library.length ? library : SEED_TRACKS,
             charts: (trend.length ? trend : SEED_TRACKS),

@@ -89,17 +89,28 @@ export async function getTrack(id) {
   return data ? normalizeTrack(data) : null
 }
 
-// Resolve a list of search terms (artist names) to one top track each, in
-// parallel. Failed/empty searches are skipped. Used to build the curated seed.
+// Run async fn over items with limited concurrency.
+async function mapLimit(items, limit, fn) {
+  const out = []
+  let i = 0
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (i < items.length) {
+      const idx = i++
+      try { out[idx] = await fn(items[idx]) } catch { out[idx] = [] }
+    }
+  })
+  await Promise.all(workers)
+  return out
+}
+
+// Resolve a list of search terms (artist names) to a few tracks each, with
+// limited concurrency. Failed/empty searches are skipped.
 export async function resolveSeed(terms, perTerm = 1) {
-  const results = await Promise.allSettled(
-    terms.map(q => searchTracks(q, perTerm))
-  )
+  const results = await mapLimit(terms, 6, q => searchTracks(q, perTerm))
   const seen = new Set()
   const out = []
-  for (const r of results) {
-    if (r.status !== 'fulfilled') continue
-    for (const t of r.value) {
+  for (const list of results) {
+    for (const t of (list || [])) {
       if (seen.has(t.id)) continue
       seen.add(t.id)
       out.push(t)

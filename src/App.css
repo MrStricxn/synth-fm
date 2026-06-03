@@ -86,52 +86,12 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Mobile (phones / small tablets) — bottom tab bar, floating mini-player,
-   single-column layout. The desktop sidebar is replaced by <MobileNav/>.
+   Mobile (phones / small tablets). NOTE: per-component mobile overrides live in
+   each component's own CSS file so they win on source order (a media query adds
+   no specificity, so a later base rule in e.g. Sidebar.css would otherwise
+   override an App.css rule). Only App-owned selectors belong here.
    ────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 820px) {
-  .app__body {
-    padding: 6px 6px 0;
-    gap: 0;
-  }
-  .sidebar { display: none; }
+  .app__body { padding: 6px 6px 0; gap: 0; }
   .app__main { border-radius: 14px; }
-
-  /* Mini-player floats above the bottom tab bar */
-  .player-bar {
-    position: fixed;
-    left: 8px;
-    right: 8px;
-    bottom: calc(64px + env(safe-area-inset-bottom));
-    height: 62px;
-    margin: 0;
-    gap: 10px;
-    padding: 0 12px;
-    z-index: 45;
-  }
-  .player-bar__track { width: auto; flex: 1; min-width: 0; cursor: pointer; }
-  .player-bar__volume,
-  .player-bar__progress { display: none; }
-  .player-bar__center { flex: 0 0 auto; margin: 0; }
-  .player-bar__controls { gap: 14px; }
-  .player-bar__btn[aria-label="shuffle"],
-  .player-bar__btn[aria-label="repeat"] { display: none; }
-
-  /* Content needs clearance for the fixed mini-player + tab bar */
-  .view {
-    padding: 18px 14px calc(150px + env(safe-area-inset-bottom));
-  }
-  .view__title { font-size: 24px; }
-
-  .library-view__grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  }
-
-  /* Fullscreen player: clear the notch / home indicator */
-  .now-playing { padding: calc(24px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom)); }
-  .now-playing__close { top: calc(18px + env(safe-area-inset-top)); }
-}
-
-@media (max-width: 420px) {
-  .library-view__grid { grid-template-columns: repeat(2, 1fr); }
 }

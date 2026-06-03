@@ -36,8 +36,10 @@ export const SEED_ARTISTS = [
 // + accurate titles than Audius).
 export const CIS_ARTISTS = [
   'oxxxymiron', 'miyagi andy panda', 'pharaoh', 'skriptonit', 'big baby tape',
-  'kizaru', 'basta', 'morgenshtern', 'jah khalib', 'noize mc',
-  'face', 'obladaet', 'og buda', 't-fest', 'gone fludd', 'scriptonite',
+  'kizaru', 'basta', 'morgenshtern', 'jah khalib', 'noize mc', 'face',
+  'obladaet', 'og buda', 't-fest', 'gone fludd', 'scriptonite', 'lovv66',
+  'seemee', 'platina', 'boulevard depo', 'mayot', 'soda luv', 'friendly thug',
+  'rocket', 'dark prince', 'i61', 'mnogoznaal', 'thomas mraz', 'lildrughill',
 ]
 
 // Backwards-compatible exports (consumed by store/tests/views).

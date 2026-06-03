@@ -241,3 +241,26 @@
   transition: transform 0.15s;
 }
 .player-bar__vol-track:hover .player-bar__vol-thumb { transform: translate(-50%, -50%) scale(1); }
+
+/* ── Mobile: floating mini-player above the bottom tab bar ── */
+@media (max-width: 820px) {
+  .player-bar {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    height: 60px;
+    margin: 0;
+    gap: 8px;
+    padding: 0 10px;
+    z-index: 45;
+  }
+  .player-bar__track { width: auto; flex: 1; min-width: 0; gap: 10px; }
+  .player-bar__volume,
+  .player-bar__progress { display: none; }
+  .player-bar__center { flex: 0 0 auto; margin: 0; max-width: none; }
+  .player-bar__controls { gap: 12px; }
+  .player-bar__btn[aria-label="shuffle"],
+  .player-bar__btn[aria-label="repeat"] { display: none; }
+  .player-bar__like { display: none; }
+}

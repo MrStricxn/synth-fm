@@ -109,3 +109,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* On mobile the sidebar is replaced by the bottom <MobileNav/>. */
+@media (max-width: 820px) {
+  .sidebar { display: none; }
+}
