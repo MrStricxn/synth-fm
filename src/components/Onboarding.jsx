@@ -1,7 +1,7 @@
 import './Onboarding.css'
 import { useState } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
-import { AUDIUS_GENRES } from '../api/audius'
+import { GENRES } from '../data/library'
 import Logo from './Logo'
 
 // First-run genre picker. The chosen genres are stored per-browser and seed the
@@ -27,7 +27,7 @@ export default function Onboarding() {
         <p className="onboarding__sub">Выбери пару жанров — соберём подборку под тебя. Это можно изменить позже.</p>
 
         <div className="onboarding__genres">
-          {AUDIUS_GENRES.map(g => (
+          {GENRES.map(g => (
             <button
               key={g}
               className={`onboarding__chip${picked.includes(g) ? ' active' : ''}`}
