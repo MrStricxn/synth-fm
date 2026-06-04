@@ -21,45 +21,65 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization,x-requested-with,content-type',
 }
 
-http
-  .createServer((req, res) => {
-    // Answer the browser's CORS preflight locally — never forward it upstream.
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204, CORS)
-      res.end()
-      return
-    }
+// Build the response headers we send back to the browser. Yandex's storage host
+// already sets its own `access-control-allow-origin`, so naively appending ours
+// (different casing = a second header key) yields TWO ACAO headers — which every
+// browser rejects as a CORS error. Strip ALL upstream access-control-* headers
+// first, then apply exactly one CORS set.
+function buildResponseHeaders(upstream) {
+  const out = {}
+  for (const [k, v] of Object.entries(upstream)) {
+    if (k.toLowerCase().startsWith('access-control-')) continue
+    out[k] = v
+  }
+  return { ...out, ...CORS }
+}
 
-    // The path is `/<full-target-url>` — strip the single leading slash.
-    const target = req.url.slice(1)
-    let url
-    try {
-      url = new URL(target)
-    } catch {
-      res.writeHead(400, CORS)
-      res.end('Bad target URL')
-      return
-    }
+function handler(req, res) {
+  // Answer the browser's CORS preflight locally — never forward it upstream.
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, CORS)
+    res.end()
+    return
+  }
 
-    // Forward request headers minus the ones that leak the browser origin (→ 403)
-    // or describe the wrong hop. Authorization (OAuth token) is preserved.
-    const headers = { ...req.headers }
-    delete headers.origin
-    delete headers.referer
-    delete headers.connection
-    delete headers['x-requested-with']
-    headers.host = url.host
+  // The path is `/<full-target-url>` — strip the single leading slash.
+  const target = req.url.slice(1)
+  let url
+  try {
+    url = new URL(target)
+  } catch {
+    res.writeHead(400, CORS)
+    res.end('Bad target URL')
+    return
+  }
 
-    const upstream = https.request(url, { method: req.method, headers }, (up) => {
-      res.writeHead(up.statusCode, { ...up.headers, ...CORS })
-      up.pipe(res)
-    })
-    upstream.on('error', (err) => {
-      res.writeHead(502, CORS)
-      res.end('Proxy error: ' + err.message)
-    })
-    req.pipe(upstream)
+  // Forward request headers minus the ones that leak the browser origin (→ 403)
+  // or describe the wrong hop. Authorization (OAuth token) is preserved.
+  const headers = { ...req.headers }
+  delete headers.origin
+  delete headers.referer
+  delete headers.connection
+  delete headers['x-requested-with']
+  headers.host = url.host
+
+  const upstream = https.request(url, { method: req.method, headers }, (up) => {
+    res.writeHead(up.statusCode, buildResponseHeaders(up.headers))
+    up.pipe(res)
   })
-  .listen(port, host, () => {
+  upstream.on('error', (err) => {
+    res.writeHead(502, CORS)
+    res.end('Proxy error: ' + err.message)
+  })
+  req.pipe(upstream)
+}
+
+// Only start listening when run directly (`node server/cors-proxy.cjs`), so the
+// module can be imported in tests without binding the port.
+if (require.main === module) {
+  http.createServer(handler).listen(port, host, () => {
     console.log(`CORS proxy on ${host}:${port}`)
   })
+}
+
+module.exports = { buildResponseHeaders, handler, CORS }
