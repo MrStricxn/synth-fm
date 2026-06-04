@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { SEED_TRACKS, SEED_ARTISTS, CIS_ARTISTS } from '../data/library'
-import { trendingTracks, searchTracks, resolveSeed } from '../api/audius'
-import * as hearthis from '../api/hearthis'
+import { SEED_TRACKS, SEED_ARTISTS } from '../data/library'
+import * as yandex from '../api/yandex'
 import { supabase, isAuthConfigured } from '../api/supabase'
 
 // Debounced push of the user's library to Supabase (cloud sync).
@@ -210,22 +209,19 @@ export const usePlayerStore = create(
       // "stuck" behind search results.
       setActiveView: (view, playlistId = null) => set({ activeView: view, activePlaylistId: playlistId, searchQuery: '' }),
 
-      // ── Audius: live catalogue ────────────────────────────────────────────
+      // ── Yandex: live catalogue ────────────────────────────────────────────
       loadCatalogue: async () => {
         if (get().catalogueLoaded || get().loadingCatalogue) return
         set({ loadingCatalogue: true })
         try {
-          const [trend, seed, cisHt, cisAu] = await Promise.all([
-            trendingTracks({ time: 'week', limit: 25 }).catch(() => []),
-            resolveSeed(SEED_ARTISTS, 2).catch(() => []),
-            hearthis.resolveSeed(CIS_ARTISTS, 2).catch(() => []),  // CIS via hearthis
-            resolveSeed(CIS_ARTISTS, 1).catch(() => []),           // CIS via Audius (complements hearthis)
+          const [chart, seed] = await Promise.all([
+            yandex.trendingTracks(40).catch(() => []),
+            yandex.resolveSeed(SEED_ARTISTS, 2).catch(() => []),
           ])
-          // CIS first so Russian rap (proper titles) leads the library.
-          const library = dedupe([...cisHt, ...cisAu, ...trend, ...seed, ...SEED_TRACKS])
+          const library = dedupe([...seed, ...chart, ...SEED_TRACKS])
           set({
             library: library.length ? library : SEED_TRACKS,
-            charts: (trend.length ? trend : SEED_TRACKS),
+            charts: chart.length ? chart : SEED_TRACKS,
             catalogueLoaded: true,
             loadingCatalogue: false,
           })
@@ -234,7 +230,7 @@ export const usePlayerStore = create(
         }
       },
 
-      // ── Audius: search (debounced from the UI) ────────────────────────────
+      // ── Yandex: search (debounced from the UI) ────────────────────────────
       setSearchQuery: (q) => {
         set({ searchQuery: q })
         const query = q.trim()
@@ -243,20 +239,16 @@ export const usePlayerStore = create(
         // Tag this request so a slower earlier one can't overwrite a newer one.
         const token = (get()._searchToken || 0) + 1
         set({ _searchToken: token })
-        // Query both sources; hearthis (CIS) results lead, Audius (global) follow.
-        Promise.all([
-          hearthis.searchTracks(query, 20).catch(() => []),
-          searchTracks(query, 20).catch(() => []),
-        ])
-          .then(([cis, audius]) => {
-            if (get()._searchToken === token) set({ searchResults: dedupe([...cis, ...audius]), searchLoading: false })
+        yandex.searchTracks(query, 20)
+          .then((results) => {
+            if (get()._searchToken === token) set({ searchResults: dedupe(results), searchLoading: false })
           })
           .catch(() => {
             if (get()._searchToken === token) set({ searchResults: [], searchLoading: false })
           })
       },
 
-      // ── Audius: personalised recommendations ──────────────────────────────
+      // ── Yandex: personalised recommendations ──────────────────────────────
       // Built from the user's liked artists, listening stats and onboarding
       // genres. Every browser ends up with a different list because the inputs
       // (likes / plays / picked genres) are per-user in localStorage.
@@ -276,13 +268,10 @@ export const usePlayerStore = create(
 
         try {
           const jobs = []
-          for (const a of topArtists) {
-            jobs.push(hearthis.searchTracks(a, 4).catch(() => []))
-            jobs.push(searchTracks(a, 4).catch(() => []))
-          }
-          for (const g of (genres || []).slice(0, 3)) jobs.push(trendingTracks({ genre: g, limit: 8 }).catch(() => []))
-          // Cold start (no signal yet): fall back to overall trending.
-          if (!jobs.length) jobs.push(trendingTracks({ limit: 20 }).catch(() => []))
+          for (const a of topArtists) jobs.push(yandex.searchTracks(a, 6).catch(() => []))
+          for (const g of (genres || []).slice(0, 3)) jobs.push(yandex.searchTracks(g, 6).catch(() => []))
+          // Cold start (no signal yet): fall back to the chart.
+          if (!jobs.length) jobs.push(yandex.trendingTracks(20).catch(() => []))
 
           const batches = await Promise.all(jobs)
           const likedIds = new Set(liked.map(t => t.id))

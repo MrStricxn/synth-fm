@@ -24,7 +24,7 @@ export default function MainContent() {
 
   const { playTrack, toggleLike, isLiked } = usePlayerStore.getState()
 
-  // Search is global — it overrides the active view and queries Audius live.
+  // Search is global — it overrides the active view and queries Yandex live.
   if (searchQuery.trim()) {
     return <SearchResultsView query={searchQuery} results={searchResults} loading={searchLoading}
       currentTrack={currentTrack} isPlaying={isPlaying} onPlay={playTrack} onLike={toggleLike} isLiked={isLiked} />

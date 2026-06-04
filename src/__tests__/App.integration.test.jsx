@@ -4,20 +4,12 @@ import App from '../App'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { LIBRARY } from '../data/library'
 
-// The app now streams from Audius. Mock the API so tests never hit the network.
-vi.mock('../api/audius', () => ({
+// The app streams from Yandex. Mock the API so tests never hit the network.
+vi.mock('../api/yandex', () => ({
   trendingTracks: vi.fn(() => Promise.resolve([])),
   searchTracks: vi.fn(() => Promise.resolve([])),
   resolveSeed: vi.fn(() => Promise.resolve([])),
-  getTrack: vi.fn(() => Promise.resolve(null)),
-  streamUrl: (id) => `https://audius.test/stream/${id}`,
-  colorFor: () => 'linear-gradient(135deg, #9d4edd 0%, #e0509f 100%)',
-  AUDIUS_GENRES: ['Electronic', 'Hip-Hop/Rap'],
-}))
-
-vi.mock('../api/hearthis', () => ({
-  searchTracks: vi.fn(() => Promise.resolve([])),
-  resolveSeed: vi.fn(() => Promise.resolve([])),
+  getStreamUrl: vi.fn(() => Promise.resolve('https://stream.test/x.mp3')),
   normalizeTrack: vi.fn(),
 }))
 
