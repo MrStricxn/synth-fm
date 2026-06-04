@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { normalizeTrack } from '../yandex'
+import md5 from 'js-md5'
+import { buildSignedUrl, SIGN_SALT } from '../yandex'
 
 describe('yandex normalizeTrack', () => {
   const raw = {
@@ -33,5 +35,21 @@ describe('yandex normalizeTrack', () => {
     expect(t.artist).toBe('Unknown')
     expect(t.duration).toBe(0)
     expect(t.artwork).toBe('')
+  })
+})
+
+describe('yandex buildSignedUrl', () => {
+  const info = { host: 's1.storage.mds.yandex.net', path: '/get-mp3/abc/123/file.mp3', ts: '1700000000', s: 'deadbeef' }
+
+  it('proves the md5 dependency works (known vector)', () => {
+    expect(md5('abc')).toBe('900150983cd24fb0d6963f7d28e17f72')
+  })
+
+  it('signs with salt + path-without-leading-slash + s, in the get-mp3 layout', () => {
+    const calls = []
+    const fakeMd5 = (input) => { calls.push(input); return 'SIGN' }
+    const url = buildSignedUrl(info, fakeMd5)
+    expect(calls[0]).toBe(`${SIGN_SALT}get-mp3/abc/123/file.mp3deadbeef`)
+    expect(url).toBe('https://s1.storage.mds.yandex.net/get-mp3/SIGN/1700000000/get-mp3/abc/123/file.mp3')
   })
 })

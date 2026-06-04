@@ -3,6 +3,7 @@
 // with `Authorization: OAuth <token>`. The final MP3 is a signed storage URL
 // played directly by the native <audio> engine (no token, no proxy) — see
 // getStreamUrl / buildSignedUrl below.
+import md5 from 'js-md5'
 import { colorFor } from './audius'
 
 const TOKEN = import.meta.env.VITE_YANDEX_TOKEN || ''
@@ -13,6 +14,16 @@ const API = 'https://api.music.yandex.net'
 function coverUrl(uri, size = '400x400') {
   if (!uri) return ''
   return `https://${uri.replace('%%', size)}`
+}
+
+// Salt used by Yandex to sign direct-download URLs (stable, widely documented).
+export const SIGN_SALT = 'XGRlBW9FXlekgbPrRHuSiA'
+
+// Given the JSON download descriptor {host, path, ts, s}, compute the signed
+// MP3 URL. md5 is injectable for testing; defaults to js-md5.
+export function buildSignedUrl({ host, path, ts, s }, md5fn = md5) {
+  const sign = md5fn(SIGN_SALT + path.replace(/^\//, '') + s)
+  return `https://${host}/get-mp3/${sign}/${ts}${path}`
 }
 
 // Yandex track → the shape the rest of the app already expects. streamUrl is
