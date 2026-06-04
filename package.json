@@ -9,10 +9,12 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "proxy": "node server/cors-proxy.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
+    "js-md5": "^0.8.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.14"
