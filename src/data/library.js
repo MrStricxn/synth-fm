@@ -1,45 +1,50 @@
-// Static seed catalogue for Audius. These are real Audius track ids captured
-// from trending — they give the app something playable on first paint and let
-// the test suite run without network. At runtime `loadCatalogue()` in the store
-// fetches fresh trending + resolves SEED_ARTISTS for a richer, live catalogue.
+// Static seed catalogue (Yandex). Real chart track ids captured 2026-06-05 (kz
+// region) so the app paints instantly and the test suite runs offline. At
+// runtime `loadCatalogue()` fetches the live chart + resolves SEED_ARTISTS.
+import { colorFor } from '../api/colors'
 
-import { streamUrl, colorFor } from '../api/audius'
-
-const raw = [
-  { id: 'E6bM2N', title: 'One Less Lonely Girl (BONNIE X CLYDE Remix)', artist: 'BONNIE X CLYDE', artwork: 'https://audius-creator-16.theblueprint.xyz/content/baeaaaiqsebwcsz44ogjz5tnx2w4gmblgozmazzrcvhsq5v4a25rekck3p2d2m/480x480.jpg', duration: 155000, genre: 'electronic', playCount: 1334 },
-  { id: '31Jyo9q', title: 'RAIVA', artist: 'NAZAAR', artwork: 'https://audius-content-5.figment.io/content/baeaaaiqseah6oencrbearrwn47cyifknfg7atzeokfncykdlo6ohsqy5ex62c/480x480.jpg', duration: 164000, genre: 'trap', playCount: 755 },
-  { id: 'dpb3Elm', title: 'Dont Be Shy', artist: 'Rixx, Mr Strings', artwork: 'https://cn1.mainnet.audiusindex.org/content/baeaaaiqsedxyehqxldgqcf7x2xbboycl6ggspfj6dyctkvtqytpfunb4gej2g/480x480.jpg', duration: 288000, genre: 'electronic', playCount: 309 },
-  { id: 'r4NVNKO', title: 'Gucci purse', artist: 'Krxnic', artwork: 'https://cn1.shakespearetech.com/content/baeaaaiqseclra5ykajsoazmpbxofjtjfco7gugu4dkriejotqfmurql7nytdu/480x480.jpg', duration: 192000, genre: 'hip-hop/rap', playCount: 302 },
-  { id: 'dloY13J', title: 'Sound System Check', artist: 'ohnoitsdoug x DISKADE', artwork: 'https://val007.open-audio-validator.com/content/baeaaaiqsea72nymfv57qy4ud3vifcunvbb7hwuyuxsby3e2bx2ctokgaq2a6a/480x480.jpg', duration: 192000, genre: 'dubstep', playCount: 224 },
-  { id: 'lwaNJJK', title: 'FORTNITE EVERY NIGHT', artist: 'Ronnie Stelly', artwork: 'https://audius-02.staked.cloud/content/baeaaaiqsed64gqdp5oflmorg3foiticsuatb62v5fjqppyqohsznaqivf7e4m/480x480.jpg', duration: 156000, genre: 'hip-hop/rap', playCount: 176 },
-  { id: '6EP3YzG', title: 'OUR EYES (original mix)', artist: 'BINAP', artwork: 'https://creatornode2.audius.co/content/baeaaaiqsecngqfa3f7un6emp3c4xt27zzvdmhhihph25rtlpypddbeig3wa2w/480x480.jpg', duration: 174000, genre: 'house', playCount: 265 },
-  { id: 'lW4jPZZ', title: 'The Montauk', artist: 'Gramatik', artwork: 'https://val015.open-audio-validator.com/content/baeaaaiqsea3s5jrw5krna77o74r5m3iye6vovfukqh4yg4jnvn3r2l3azip44/480x480.jpg', duration: 338000, genre: 'glitch hop', playCount: 168 },
-  { id: 'YbXja7', title: 'Instant Crush (Fattybass Remix)', artist: 'Fattybass', artwork: 'https://creatornode2.audius.co/content/baeaaaiqseaexu6cozcustnycaj7egwg762bjuipkrh5zhkmptbtfk5sqoqlii/480x480.jpg', duration: 289000, genre: 'tech house', playCount: 257 },
-  { id: 'YVo9amr', title: 'Cash Contact Me', artist: 'KARAKAPLAN', artwork: 'https://val011.open-audio-validator.com/content/baeaaaiqseauh73oukvcc7mvuuah242uibtsp4kk4nwfniwsi5qmvdqxs5g3qq/480x480.jpg', duration: 100000, genre: 'hip-hop/rap', playCount: 171 },
-]
-
-function build(t) {
-  return { ...t, streamUrl: streamUrl(t.id), color: colorFor(t.id), source: 'audius' }
+function cover(uri, size = '400x400') {
+  return uri ? `https://${uri.replace('%%', size)}` : ''
 }
 
-export const SEED_TRACKS = raw.map(build)
-
-// Artist / query terms resolved against Audius search at runtime to broaden the
-// catalogue beyond trending (keeps a thread of the original rap curation).
-export const SEED_ARTISTS = [
-  'skriptonit', 'pharaoh', 'oxxxymiron', 'miyagi endshpil', 'big baby tape',
-  'kizaru', 'morgenshtern', 'phonk', 'lofi hip hop', 'synthwave', 'kavinsky',
-  'drum and bass', 'jungle', 'memphis phonk',
+const rawYa = [
+  { id: '151020719', title: 'Шадэ', artist: 'By Индия', cover: 'avatars.yandex.net/get-music-content/16154377/525b9915.a.41920857-2/%%', dur: 168940 },
+  { id: '150053393', title: 'Мальборо', artist: 'SAYAN', cover: 'avatars.yandex.net/get-music-content/19999910/9afd1da4.a.41489388-1/%%', dur: 122720 },
+  { id: '151136140', title: 'ЭКСПОНАТ', artist: 'MIA BOYKA', cover: 'avatars.yandex.net/get-music-content/20372582/82527af1.a.41976933-2/%%', dur: 98760 },
+  { id: '151724864', title: 'Біз жолығамыз', artist: 'Abzal Uteshov', cover: 'avatars.yandex.net/get-music-content/19035207/af7ffaa4.a.42228159-1/%%', dur: 176300 },
+  { id: '150372866', title: 'Махаббатым - Qazaq Edition', artist: 'baqzhvn', cover: 'avatars.yandex.net/get-music-content/16450533/5aaede59.a.41636053-1/%%', dur: 230010 },
+  { id: '151092654', title: 'Sagynysh', artist: 'Sadraddin', cover: 'avatars.yandex.net/get-music-content/16154377/e8523e30.a.41958888-1/%%', dur: 165920 },
+  { id: '150056922', title: 'Ademi', artist: 'Kalifarniya', cover: 'avatars.yandex.net/get-music-content/17696724/947e24b2.a.41491054-1/%%', dur: 228000 },
+  { id: '147654214', title: 'ВАТ ИЗ ЛАВ', artist: 'Junior', cover: 'avatars.yandex.net/get-music-content/17740720/97c3f996.a.40416390-1/%%', dur: 145800 },
 ]
 
-// CIS / Russian-rap seed terms resolved against hearthis.at (better RU coverage
-// + accurate titles than Audius).
-export const CIS_ARTISTS = [
+export const SEED_TRACKS = rawYa.map(t => ({
+  id: `ya_${t.id}`,
+  trackId: t.id,
+  title: t.title,
+  artist: t.artist,
+  artwork: cover(t.cover),
+  streamUrl: '',
+  duration: t.dur,
+  genre: '',
+  playCount: 0,
+  color: colorFor(`ya_${t.id}`),
+  source: 'yandex',
+}))
+
+// Artist / query terms resolved against Yandex search at runtime to broaden the
+// catalogue beyond the chart.
+export const SEED_ARTISTS = [
   'oxxxymiron', 'miyagi andy panda', 'pharaoh', 'skriptonit', 'big baby tape',
   'kizaru', 'basta', 'morgenshtern', 'jah khalib', 'noize mc', 'face',
-  'obladaet', 'og buda', 't-fest', 'gone fludd', 'scriptonite', 'lovv66',
-  'seemee', 'platina', 'boulevard depo', 'mayot', 'soda luv', 'friendly thug',
-  'rocket', 'dark prince', 'i61', 'mnogoznaal', 'thomas mraz', 'lildrughill',
+  'obladaet', 'og buda', 't-fest', 'gone fludd', 'mayot', 'soda luv',
+  'platina', 'boulevard depo', 'seemee', 'kavinsky', 'synthwave', 'phonk',
+]
+
+// Genre chips for onboarding + recommendation seeds (used as Yandex search terms).
+export const GENRES = [
+  'Synthwave', 'Phonk', 'Hip-Hop', 'Electronic', 'Lo-Fi',
+  'House', 'Drum & Bass', 'Pop', 'Rock', 'R&B',
 ]
 
 // Backwards-compatible exports (consumed by store/tests/views).
