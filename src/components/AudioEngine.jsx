@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { getStreamUrl } from '../api/yandex'
 
 // Playback engine backed by a native <audio> element streaming from Audius.
 // Replaces the old SoundCloud iframe widget. Store progress/duration are kept
@@ -13,16 +14,33 @@ export default function AudioEngine() {
   const isPlaying    = usePlayerStore(s => s.isPlaying)
   const volume       = usePlayerStore(s => s.volume)
 
-  // Load + (maybe) play whenever the selected track changes.
+  // Load + (maybe) play whenever the selected track changes. Yandex tracks have
+  // no streamUrl yet — resolve the signed MP3 URL on demand here.
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio || !currentTrack?.streamUrl) return
-    if (loadedUrlRef.current === currentTrack.streamUrl) return
-    loadedUrlRef.current = currentTrack.streamUrl
-    audio.src = currentTrack.streamUrl
-    audio.load()
-    const { isPlaying: playing } = usePlayerStore.getState()
-    if (playing) audio.play().catch(err => console.warn('autoplay blocked:', err))
+    if (!audio || !currentTrack) return
+    let cancelled = false
+    ;(async () => {
+      let url = currentTrack.streamUrl
+      if (!url && currentTrack.source === 'yandex' && currentTrack.trackId) {
+        try {
+          url = await getStreamUrl(currentTrack.trackId)
+        } catch (err) {
+          console.warn('yandex stream resolve failed, skipping:', err)
+          usePlayerStore.getState().nextTrack()
+          return
+        }
+      }
+      if (cancelled || !url) return
+      if (loadedUrlRef.current === url) return
+      loadedUrlRef.current = url
+      audio.src = url
+      audio.load()
+      if (usePlayerStore.getState().isPlaying) {
+        audio.play().catch(err => console.warn('autoplay blocked:', err))
+      }
+    })()
+    return () => { cancelled = true }
   }, [currentTrack])
 
   // Sync play / pause.
