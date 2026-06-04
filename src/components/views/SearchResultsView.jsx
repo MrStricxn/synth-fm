@@ -2,7 +2,7 @@ import TrackRow from '../TrackRow'
 import PlayActions from '../PlayActions'
 import './views.css'
 
-// Live Audius search results (fetched in the store, debounced via setSearchQuery).
+// Live Yandex search results (fetched in the store, debounced via setSearchQuery).
 export default function SearchResultsView({ query, results, loading, currentTrack, onPlay, onLike, isLiked }) {
   return (
     <div className="view">
@@ -15,7 +15,7 @@ export default function SearchResultsView({ query, results, loading, currentTrac
       </div>
 
       {loading && !results.length ? (
-        <div className="view__loading">Ищем на Audius…</div>
+        <div className="view__loading">Ищем…</div>
       ) : results.length === 0 ? (
         <div className="view__empty">
           <div className="view__empty-emoji">🔍</div>

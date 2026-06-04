@@ -3,13 +3,13 @@ import TrackRow from '../TrackRow'
 import PlayActions from '../PlayActions'
 import './views.css'
 
-// Trending on Audius this week.
+// Chart / trending on Yandex.Music.
 export default function DiscoverView({ tracks, loading, currentTrack, isPlaying, onPlay, onLike, isLiked }) {
   if (loading && !tracks.length) {
     return (
       <div className="view">
         <div className="view__head"><h1 className="view__title view__title--grad">Чарты</h1></div>
-        <div className="view__loading">Загружаем тренды Audius…</div>
+        <div className="view__loading">Загружаем тренды…</div>
       </div>
     )
   }
@@ -20,7 +20,7 @@ export default function DiscoverView({ tracks, loading, currentTrack, isPlaying,
     <div className="view">
       <div className="view__head">
         <h1 className="view__title view__title--grad">Чарты</h1>
-        <span className="view__sub">Тренды Audius за неделю</span>
+        <span className="view__sub">Тренды Яндекс.Музыки</span>
         <PlayActions tracks={tracks} />
       </div>
 

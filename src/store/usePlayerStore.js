@@ -230,7 +230,7 @@ export const usePlayerStore = create(
         }
       },
 
-      // ── Audius: search (debounced from the UI) ────────────────────────────
+      // ── Yandex: search (debounced from the UI) ────────────────────────────
       setSearchQuery: (q) => {
         set({ searchQuery: q })
         const query = q.trim()
@@ -248,7 +248,7 @@ export const usePlayerStore = create(
           })
       },
 
-      // ── Audius: personalised recommendations ──────────────────────────────
+      // ── Yandex: personalised recommendations ──────────────────────────────
       // Built from the user's liked artists, listening stats and onboarding
       // genres. Every browser ends up with a different list because the inputs
       // (likes / plays / picked genres) are per-user in localStorage.

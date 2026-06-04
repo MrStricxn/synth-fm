@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { getStreamUrl } from '../api/yandex'
 
-// Playback engine backed by a native <audio> element streaming from Audius.
-// Replaces the old SoundCloud iframe widget. Store progress/duration are kept
+// Playback engine backed by a native <audio> element streaming from Yandex.Music.
+// Store progress/duration are kept
 // in milliseconds (the UI already formats ms), while the audio element works in
 // seconds — we convert at the boundary.
 export default function AudioEngine() {

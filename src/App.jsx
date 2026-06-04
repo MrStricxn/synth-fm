@@ -17,7 +17,7 @@ import PlayerBar from './components/PlayerBar'
 export default function App() {
   useKeyboardShortcuts()
 
-  // Kick off the live Audius catalogue once on mount.
+  // Kick off the live Yandex catalogue once on mount.
   useEffect(() => { usePlayerStore.getState().loadCatalogue() }, [])
 
   const onboarded        = usePlayerStore(s => s.onboarded)
