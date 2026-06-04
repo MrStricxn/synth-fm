@@ -1,5 +1,5 @@
 // Yandex.Music client. The official API has no CORS and needs an OAuth token,
-// so JSON calls go through a local cors-anywhere proxy (see server/cors-proxy.cjs)
+// so JSON calls go through a local origin-stripping proxy (see server/cors-proxy.cjs)
 // with `Authorization: OAuth <token>`. The final MP3 is a signed storage URL
 // played directly by the native <audio> engine (no token, no proxy) — see
 // getStreamUrl / buildSignedUrl below.
