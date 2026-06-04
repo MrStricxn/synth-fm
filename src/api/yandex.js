@@ -45,10 +45,10 @@ export function normalizeTrack(t) {
   }
 }
 
-// All JSON requests go through the CORS proxy with the OAuth header. The proxy
-// expects the target URL appended verbatim: `${PROXY}/${API}/<endpoint>`.
+// All JSON requests go through the CORS proxy with the OAuth header. Contract:
+// `${PROXY}?url=<encodeURIComponent(target)>`.
 async function apiGet(endpoint) {
-  const res = await fetch(`${PROXY}/${API}${endpoint}`, {
+  const res = await fetch(`${PROXY}?url=${encodeURIComponent(`${API}${endpoint}`)}`, {
     headers: { Authorization: `OAuth ${TOKEN}`, 'X-Requested-With': 'XMLHttpRequest' },
   })
   if (res.status === 401) throw new Error('Yandex 401 — токен протух/не задан (VITE_YANDEX_TOKEN)')
@@ -64,7 +64,7 @@ export async function getStreamUrl(trackId) {
   if (!mp3s.length) throw new Error(`no mp3 variant for track ${trackId}`)
   mp3s.sort((a, b) => (b.bitrateInKbps || 0) - (a.bitrateInKbps || 0))
   // downloadInfoUrl returns XML by default; &format=json gives {host,path,ts,s}.
-  const res = await fetch(`${PROXY}/${mp3s[0].downloadInfoUrl}&format=json`, {
+  const res = await fetch(`${PROXY}?url=${encodeURIComponent(`${mp3s[0].downloadInfoUrl}&format=json`)}`, {
     headers: { Authorization: `OAuth ${TOKEN}`, 'X-Requested-With': 'XMLHttpRequest' },
   })
   if (!res.ok) throw new Error(`Yandex download-info → ${res.status}`)

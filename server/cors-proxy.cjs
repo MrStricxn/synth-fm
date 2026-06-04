@@ -7,7 +7,7 @@
 // minimal pass-through instead. Keeps the OAuth token on YOUR machine — requests
 // transit localhost, not a third-party host.
 //
-// Usage: GET http://localhost:8080/<full-target-url>
+// Usage: GET http://localhost:8080/?url=<encodeURIComponent(full-target-url)>
 const http = require('http')
 const https = require('https')
 const { URL } = require('url')
@@ -43,8 +43,14 @@ function handler(req, res) {
     return
   }
 
-  // The path is `/<full-target-url>` — strip the single leading slash.
-  const target = req.url.slice(1)
+  // Contract: GET /?url=<encodeURIComponent(full-target-url)>
+  let target
+  try {
+    target = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams.get('url')
+  } catch {
+    target = null
+  }
+  if (!target) { res.writeHead(400, CORS); res.end('Missing url'); return }
   let url
   try {
     url = new URL(target)
