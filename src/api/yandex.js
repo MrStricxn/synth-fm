@@ -7,7 +7,7 @@ import md5 from 'js-md5'
 import { colorFor } from './colors'
 
 const TOKEN = import.meta.env.VITE_YANDEX_TOKEN || ''
-const PROXY = (import.meta.env.VITE_YANDEX_PROXY || 'http://localhost:8080').replace(/\/$/, '')
+const PROXY = (import.meta.env.VITE_YANDEX_PROXY || '/api/proxy').replace(/\/$/, '')
 const API = 'https://api.music.yandex.net'
 
 // avatars.yandex.net cover URIs end in `%%` — substitute a concrete size.
