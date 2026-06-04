@@ -4,7 +4,7 @@
 // played directly by the native <audio> engine (no token, no proxy) — see
 // getStreamUrl / buildSignedUrl below.
 import md5 from 'js-md5'
-import { colorFor } from './audius'
+import { colorFor } from './colors'
 
 const TOKEN = import.meta.env.VITE_YANDEX_TOKEN || ''
 const PROXY = (import.meta.env.VITE_YANDEX_PROXY || 'http://localhost:8080').replace(/\/$/, '')
