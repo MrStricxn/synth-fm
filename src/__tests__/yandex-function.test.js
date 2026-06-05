@@ -1,16 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import handler, { isAllowed, buildResponseHeaders } from '../../api/proxy.js'
+import { handler, isAllowed, buildResponseHeaders } from '../../cloud/yandex-function/index.js'
 
-// Minimal Node-style res double that records writeHead/end without a socket.
-function fakeRes() {
-  return {
-    statusCode: null, headers: null, body: null, ended: false,
-    writeHead(code, headers) { this.statusCode = code; this.headers = headers },
-    end(body) { this.body = body; this.ended = true },
-  }
-}
-
-describe('api/proxy isAllowed', () => {
+describe('yandex-function isAllowed', () => {
   it('allows the Yandex API search/chart/download-info paths', () => {
     expect(isAllowed('https://api.music.yandex.net/search?text=x&type=track')).toBe(true)
     expect(isAllowed('https://api.music.yandex.net/landing3/chart')).toBe(true)
@@ -30,7 +21,7 @@ describe('api/proxy isAllowed', () => {
   })
 })
 
-describe('api/proxy buildResponseHeaders', () => {
+describe('yandex-function buildResponseHeaders', () => {
   it('collapses upstream + proxy ACAO into a single header', () => {
     const h = buildResponseHeaders({
       'content-type': 'application/json',
@@ -43,28 +34,24 @@ describe('api/proxy buildResponseHeaders', () => {
   })
 })
 
-describe('api/proxy handler guards (no network)', () => {
+describe('yandex-function handler guards (no network)', () => {
   it('answers OPTIONS preflight with 204', async () => {
-    const res = fakeRes()
-    await handler({ method: 'OPTIONS', query: {} }, res)
+    const res = await handler({ httpMethod: 'OPTIONS', queryStringParameters: {} })
     expect(res.statusCode).toBe(204)
   })
 
   it('returns 400 when url is missing', async () => {
-    const res = fakeRes()
-    await handler({ method: 'GET', query: {} }, res)
+    const res = await handler({ httpMethod: 'GET', queryStringParameters: {} })
     expect(res.statusCode).toBe(400)
   })
 
   it('returns 403 for a non-allowlisted target', async () => {
-    const res = fakeRes()
-    await handler({ method: 'GET', query: { url: 'https://evil.com/x' } }, res)
+    const res = await handler({ httpMethod: 'GET', queryStringParameters: { url: 'https://evil.com/x' } })
     expect(res.statusCode).toBe(403)
   })
 
   it('returns 405 for non-GET methods', async () => {
-    const res = fakeRes()
-    await handler({ method: 'POST', query: { url: 'https://api.music.yandex.net/search' } }, res)
+    const res = await handler({ httpMethod: 'POST', queryStringParameters: { url: 'https://api.music.yandex.net/search' } })
     expect(res.statusCode).toBe(405)
   })
 })

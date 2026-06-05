@@ -1,0 +1,8 @@
+{
+  "name": "yandex-music-proxy-fn",
+  "version": "1.0.0",
+  "description": "Yandex Cloud Function proxy for Yandex.Music (runs in a CIS region to avoid the 451 geo-block).",
+  "type": "module",
+  "private": true,
+  "main": "index.js"
+}
