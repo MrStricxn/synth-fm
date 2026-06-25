@@ -57,7 +57,7 @@ export function patchYandexResponse(urlString, json) {
     if (json?.result) json.result.hasPlus = true
     return json
   }
-  if (pathname.startsWith('/rotor/session/') && !urlString.includes('feedback')) {
+  if (pathname.startsWith('/rotor/session/') && !pathname.includes('feedback')) {
     if (Array.isArray(json?.result?.sequence)) {
       json.result.sequence = json.result.sequence.filter(
         item => item?.track?.title !== 'Промокод Upgrade'
