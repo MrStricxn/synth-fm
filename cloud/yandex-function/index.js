@@ -20,7 +20,8 @@ const CORS = {
 export function buildResponseHeaders(upstream) {
   const out = {}
   for (const [k, v] of Object.entries(upstream)) {
-    if (k.toLowerCase().startsWith('access-control-')) continue
+    const lk = k.toLowerCase()
+    if (lk.startsWith('access-control-') || lk === 'content-length') continue
     out[k] = v
   }
   return { ...out, ...CORS }
