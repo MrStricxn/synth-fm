@@ -17,9 +17,6 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization,x-requested-with,content-type',
 }
 
-// Strip ALL upstream access-control-* headers (Yandex storage sends its own,
-// which would duplicate ours and trip the browser's CORS check), then apply one
-// CORS set.
 export function buildResponseHeaders(upstream) {
   const out = {}
   for (const [k, v] of Object.entries(upstream)) {
@@ -29,7 +26,6 @@ export function buildResponseHeaders(upstream) {
   return { ...out, ...CORS }
 }
 
-// Only proxy the exact Yandex endpoints the player needs, over https.
 export function isAllowed(urlString) {
   let u
   try { u = new URL(urlString) } catch { return false }
@@ -39,6 +35,10 @@ export function isAllowed(urlString) {
     return u.pathname.startsWith('/search')
       || u.pathname.startsWith('/landing3/chart')
       || /^\/tracks\/\d+\/download-info$/.test(u.pathname)
+      || u.pathname.startsWith('/account/about')
+      || u.pathname.startsWith('/rotor/session/')
+      || u.pathname.startsWith('/editorial-promotion')
+      || u.pathname.startsWith('/proxy/plus-red-alert/')
   }
   if (host === 'storage.mds.yandex.net' || host.endsWith('.storage.yandex.net')) {
     return u.pathname.includes('/download-info')
@@ -46,8 +46,35 @@ export function isAllowed(urlString) {
   return false
 }
 
-// Yandex Cloud Function HTTP integration: event has httpMethod /
-// queryStringParameters; return { statusCode, headers, body, isBase64Encoded }.
+// Patch Yandex API JSON responses to simulate a Plus subscription.
+// Pure function — mutates json in place and returns it.
+export function patchYandexResponse(urlString, json) {
+  let pathname
+  try { pathname = new URL(urlString).pathname } catch { return json }
+
+  if (pathname.startsWith('/account/about')) {
+    if (json?.result) json.result.hasPlus = true
+    return json
+  }
+  if (pathname.startsWith('/rotor/session/') && !urlString.includes('feedback')) {
+    if (Array.isArray(json?.result?.sequence)) {
+      json.result.sequence = json.result.sequence.filter(
+        item => item?.track?.title !== 'Промокод Upgrade'
+      )
+    }
+    return json
+  }
+  if (pathname.startsWith('/editorial-promotion')) {
+    if (json?.result) json.result.promotions = []
+    return json
+  }
+  if (pathname.startsWith('/proxy/plus-red-alert/')) {
+    if (json?.result) json.result.alerts = []
+    return json
+  }
+  return json
+}
+
 export async function handler(event) {
   const method = event.httpMethod
   if (method === 'OPTIONS') return { statusCode: 204, headers: CORS, body: '' }
@@ -71,7 +98,15 @@ export async function handler(event) {
     ? 'public, s-maxage=300, stale-while-revalidate=600'
     : 'no-store'
 
-  const buf = Buffer.from(await up.arrayBuffer())
+  let buf = Buffer.from(await up.arrayBuffer())
+  const ct = upHeaders['content-type'] || ''
+  if (ct.includes('application/json')) {
+    try {
+      const patched = patchYandexResponse(target, JSON.parse(buf.toString('utf8')))
+      buf = Buffer.from(JSON.stringify(patched), 'utf8')
+    } catch { /* non-JSON body — forward as-is */ }
+  }
+
   return {
     statusCode: up.status,
     headers: { ...buildResponseHeaders(upHeaders), 'Cache-Control': cache },
