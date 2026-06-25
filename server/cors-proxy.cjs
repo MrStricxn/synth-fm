@@ -21,11 +21,6 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization,x-requested-with,content-type',
 }
 
-// Build the response headers we send back to the browser. Yandex's storage host
-// already sets its own `access-control-allow-origin`, so naively appending ours
-// (different casing = a second header key) yields TWO ACAO headers — which every
-// browser rejects as a CORS error. Strip ALL upstream access-control-* headers
-// first, then apply exactly one CORS set.
 function buildResponseHeaders(upstream) {
   const out = {}
   for (const [k, v] of Object.entries(upstream)) {
@@ -35,15 +30,42 @@ function buildResponseHeaders(upstream) {
   return { ...out, ...CORS }
 }
 
+// Patch Yandex API JSON responses to simulate a Plus subscription.
+// Pure function — mutates json in place and returns it.
+function patchYandexResponse(urlString, json) {
+  let pathname
+  try { pathname = new URL(urlString).pathname } catch { return json }
+
+  if (pathname.startsWith('/account/about')) {
+    if (json?.result) json.result.hasPlus = true
+    return json
+  }
+  if (pathname.startsWith('/rotor/session/') && !pathname.includes('feedback')) {
+    if (Array.isArray(json?.result?.sequence)) {
+      json.result.sequence = json.result.sequence.filter(
+        item => item?.track?.title !== 'Промокод Upgrade'
+      )
+    }
+    return json
+  }
+  if (pathname.startsWith('/editorial-promotion')) {
+    if (json?.result) json.result.promotions = []
+    return json
+  }
+  if (pathname.startsWith('/proxy/plus-red-alert/')) {
+    if (json?.result) json.result.alerts = []
+    return json
+  }
+  return json
+}
+
 function handler(req, res) {
-  // Answer the browser's CORS preflight locally — never forward it upstream.
   if (req.method === 'OPTIONS') {
     res.writeHead(204, CORS)
     res.end()
     return
   }
 
-  // Contract: GET /?url=<encodeURIComponent(full-target-url)>
   let target
   try {
     target = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams.get('url')
@@ -60,8 +82,6 @@ function handler(req, res) {
     return
   }
 
-  // Forward request headers minus the ones that leak the browser origin (→ 403)
-  // or describe the wrong hop. Authorization (OAuth token) is preserved.
   const headers = { ...req.headers }
   delete headers.origin
   delete headers.referer
@@ -70,8 +90,21 @@ function handler(req, res) {
   headers.host = url.host
 
   const upstream = https.request(url, { method: req.method, headers }, (up) => {
-    res.writeHead(up.statusCode, buildResponseHeaders(up.headers))
-    up.pipe(res)
+    const chunks = []
+    up.on('data', chunk => chunks.push(chunk))
+    up.on('end', () => {
+      let body = Buffer.concat(chunks)
+      const ct = up.headers['content-type'] || ''
+      if (ct.includes('application/json')) {
+        try {
+          const patched = patchYandexResponse(target, JSON.parse(body.toString('utf8')))
+          body = Buffer.from(JSON.stringify(patched), 'utf8')
+        } catch { /* non-JSON body — forward as-is */ }
+      }
+      res.writeHead(up.statusCode, buildResponseHeaders(up.headers))
+      res.end(body)
+    })
+    up.on('error', () => { res.writeHead(502, CORS); res.end('Upstream error') })
   })
   upstream.on('error', (err) => {
     res.writeHead(502, CORS)
@@ -80,12 +113,10 @@ function handler(req, res) {
   req.pipe(upstream)
 }
 
-// Only start listening when run directly (`node server/cors-proxy.cjs`), so the
-// module can be imported in tests without binding the port.
 if (require.main === module) {
   http.createServer(handler).listen(port, host, () => {
     console.log(`CORS proxy on ${host}:${port}`)
   })
 }
 
-module.exports = { buildResponseHeaders, handler, CORS }
+module.exports = { buildResponseHeaders, handler, CORS, patchYandexResponse }
